@@ -99,6 +99,10 @@ class CarInterfaceBase(ABC):
     ret.longitudinalActuatorDelayLowerBound = 0.15
     ret.longitudinalActuatorDelayUpperBound = 0.15
     ret.steerLimitTimer = 1.0
+
+    # No Torque Interceptor by default
+    ret.enableTorqueInterceptor = False
+
     return ret
 
   @abstractmethod
@@ -193,6 +197,7 @@ class CarStateBase(ABC):
     self.right_blinker_cnt = 0
     self.left_blinker_prev = False
     self.right_blinker_prev = False
+    #self.tiAllowed = car.CarState.
 
     # Q = np.matrix([[10.0, 0.0], [0.0, 100.0]])
     # R = 1e3
