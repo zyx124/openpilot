@@ -18,7 +18,7 @@ class CarController():
     can_sends = []
 
     apply_steer = 0
-    ti_apply_steer = 0
+    ti_apply_steer = ti_new_steer = 0
     self.steer_rate_limited = False
 
     if c.enabled:
@@ -28,8 +28,6 @@ class CarController():
           ti_new_steer = int(round(c.actuators.steer * CarControllerParams.TI_STEER_MAX))
           ti_apply_steer = apply_ti_steer_torque_limits(ti_new_steer, self.ti_apply_steer_last,
                                                     CS.out.steeringTorque, CarControllerParams)
-        else:
-          ti_apply_steer = ti_new_steer = 0
 
       new_steer = int(round(c.actuators.steer * CarControllerParams.STEER_MAX))
       apply_steer = apply_std_steer_torque_limits(new_steer, self.apply_steer_last,
