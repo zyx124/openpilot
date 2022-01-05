@@ -159,8 +159,6 @@ class CarInterface(CarInterfaceBase):
 
     if self.CS.lkas_disabled:
       events.add(EventName.lkasDisabled)
-    elif self.CS.low_speed_alert:
-      events.add(EventName.belowSteerSpeed)
 
     if not self.CS.acc_active_last and not self.CS.ti_lkas_allowed:
       events.add(EventName.steerTempUnavailable)
