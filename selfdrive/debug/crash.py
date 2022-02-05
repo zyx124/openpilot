@@ -3,12 +3,13 @@ import os
 import random
 import time
 import multiprocessing
-import speedtest
+import subprocess
 
 def log(msg):
   os.system(f"log -t crasher '{msg}'")
 
 def netactivity():
+  import speedtest
   s = speedtest.Speedtest(timeout=1)
   s.get_servers()
   s.get_best_server()
@@ -38,7 +39,10 @@ def crasher():
     #os.system(f"LD_LIBRARY_PATH= svc wifi {w}")
     #time.sleep(random.uniform(0., 1.))
 
-    if random.random() > 0.9:
+
+    q = subprocess.check_output("getprop net.qtaguid_enabled", shell=True).strip() != b'0'
+    print("q", q)
+    if q and random.random() > 0.9:
       print("killing netd in 1s")
       log("killing netd in 1s")
       time.sleep(1)
