@@ -39,9 +39,10 @@ def phone_steps(String device_type, steps) {
   lock(resource: "", label: device_type, inversePrecedence: true, variable: 'device_ip', quantity: 1) {
     timeout(time: 60, unit: 'MINUTES') {
       phone(device_ip, "git checkout", readFile("selfdrive/test/setup_device_ci.sh"),)
-      steps.each { item ->
-        phone(device_ip, item[0], item[1])
-      }
+      phone(device_ip, "flash panda", "cd panda/board && ./recover.sh")
+      #steps.each { item ->
+      #  phone(device_ip, item[0], item[1])
+      #}
     }
   }
 }
@@ -106,6 +107,7 @@ pipeline {
                     phone_steps("eon-build", [
                       ["build master-ci", "cd $SOURCE_DIR/release && EXTRA_FILES='tools/' ./build_devel.sh"],
                       ["build openpilot", "cd selfdrive/manager && ./build.py"],
+                      ["temp", "cd panda/board && ./recover.sh"],
                       ["test manager", "python selfdrive/manager/test/test_manager.py"],
                       ["onroad tests", "cd selfdrive/test/ && ./test_onroad.py"],
                       ["test car interfaces", "cd selfdrive/car/tests/ && ./test_car_interfaces.py"],
