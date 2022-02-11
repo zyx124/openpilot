@@ -40,9 +40,6 @@ def phone_steps(String device_type, steps) {
     timeout(time: 60, unit: 'MINUTES') {
       phone(device_ip, "git checkout", readFile("selfdrive/test/setup_device_ci.sh"),)
       phone(device_ip, "flash panda", "cd panda/board && ./recover.sh")
-      #steps.each { item ->
-      #  phone(device_ip, item[0], item[1])
-      #}
     }
   }
 }
