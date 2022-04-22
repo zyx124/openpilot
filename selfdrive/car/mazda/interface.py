@@ -5,6 +5,7 @@ from selfdrive.car.mazda.values import CAR, LKAS_LIMITS
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint, get_safety_config
 from selfdrive.car.interfaces import CarInterfaceBase
 from selfdrive import global_ti as TI
+from selfdrive import global_ri as RI
 
 ButtonType = car.CarState.ButtonEvent.Type
 EventName = car.CarEvent.EventName
@@ -150,6 +151,10 @@ class CarInterface(CarInterfaceBase):
     if self.CP.enableTorqueInterceptor and not TI.enabled:
       TI.enabled = True
       self.cp = self.CS.get_can_parser(self.CP)
+    if self.CP.radarInterceptMode and not RI.enabled:
+      RI.enabled = True
+      self.cp = self.CS.get_can_parser(self.CP)
+      self.cp_cam = self.CS.get_cam_can_parser(self.CP)
     ret = self.CS.update(self.cp, self.cp_cam)
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
 

@@ -434,8 +434,8 @@ class Panda(object):
 
   @ensure_health_packet_version
   def health(self):
-    dat = self._handle.controlRead(Panda.REQUEST_IN, 0xd2, 0, 0, 45)
-    a = struct.unpack("<IIIIIIIIBBBBBBBHBBBB", dat)
+    dat = self._handle.controlRead(Panda.REQUEST_IN, 0xd2, 0, 0, 46)
+    a = struct.unpack("<IIIIIIIIBBBBBBBHBBBBB", dat)
     return {
       "uptime": a[0],
       "voltage": a[1],
@@ -457,6 +457,7 @@ class Panda(object):
       "power_save_enabled": a[17],
       "heartbeat_lost": a[18],
       "torque_interceptor_detected": a[19],
+      "radar_intercept_mode": a[20],
     }
 
   # ******************* control *******************

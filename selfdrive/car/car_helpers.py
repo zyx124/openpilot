@@ -199,3 +199,10 @@ def get_ti():
 
   return car_params
 
+def enable_mazda_long():
+  print("enable_mazda_long, entering get_params")
+  CarInterface = global_ti.saved_CarInterface
+  car_params = CarInterface.get_params("mazda_long", global_ti.saved_finger)
+
+  return car_params 
+

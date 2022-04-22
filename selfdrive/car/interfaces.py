@@ -99,8 +99,9 @@ class CarInterfaceBase():
     ret.longitudinalActuatorDelayLowerBound = 0.15
     ret.longitudinalActuatorDelayUpperBound = 0.15
 
-    # No Torque Interceptor by default
+    # No Intercept by default
     ret.enableTorqueInterceptor = False
+    ret.radarInterceptMode = False
 
     return ret
 

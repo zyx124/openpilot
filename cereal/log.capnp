@@ -396,6 +396,7 @@ struct PandaState @0xa7649e2575e4591e {
   harnessStatus @21 :HarnessStatus;
   heartbeatLost @22 :Bool;
   torqueInterceptorDetected @23 :Bool;
+  radarInterceptMode @24 :Bool;
 
   enum FaultStatus {
     none @0;

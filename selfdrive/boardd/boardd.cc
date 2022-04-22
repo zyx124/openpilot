@@ -358,6 +358,7 @@ bool send_panda_states(PubMaster *pm, const std::vector<Panda *> &pandas, bool s
     ps.setHeartbeatLost((bool)(pandaState.heartbeat_lost));
     ps.setHarnessStatus(cereal::PandaState::HarnessStatus(pandaState.car_harness_status));
     ps.setTorqueInterceptorDetected(pandaState.torque_interceptor_detected);
+    ps.setRadarInterceptMode(pandaState.radar_intercept_mode);
     
 
     // Convert faults bitset to capnp list

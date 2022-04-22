@@ -385,6 +385,7 @@ struct CarParams {
   flags @64 :UInt32;         # flags for car specific quirks
   #enable torque interceptor
   enableTorqueInterceptor @65 :Bool;
+  radarInterceptMode @66 :Bool;
 
   minEnableSpeed @7 :Float32;
   minSteerSpeed @8 :Float32;
