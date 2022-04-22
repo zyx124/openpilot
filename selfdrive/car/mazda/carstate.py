@@ -36,8 +36,8 @@ class CarState(CarStateBase):
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
 
     # Match panda speed reading
-    speed_kph = cp.vl["ENGINE_DATA"]["SPEED"]
-    ret.standstill = speed_kph < .1
+    self.speed_kph = cp.vl["ENGINE_DATA"]["SPEED"]
+    ret.standstill = self.speed_kph < .1
 
     can_gear = int(cp.vl["GEAR"]["GEAR"])
     ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(can_gear, None))
@@ -86,15 +86,15 @@ class CarState(CarStateBase):
 
     # LKAS is enabled at 52kph going up and disabled at 45kph going down
     # wait for LKAS_BLOCK signal to clear when going up since it lags behind the speed sometimes
-    if speed_kph > LKAS_LIMITS.ENABLE_SPEED:
+    if self.speed_kph > LKAS_LIMITS.ENABLE_SPEED:
       self.lkas_allowed_speed = True
-    elif speed_kph < LKAS_LIMITS.DISABLE_SPEED:
+    elif self.speed_kph < LKAS_LIMITS.DISABLE_SPEED:
       self.lkas_allowed_speed = False
 
     # TODO: the signal used for available seems to be the adaptive cruise signal, instead of the main on
     #       it should be used for carState.cruiseState.nonAdaptive instead
-    ret.cruiseState.available = cp.vl["CRZ_CTRL"]["CRZ_AVAILABLE"] == 1
-    ret.cruiseState.enabled = cp.vl["CRZ_CTRL"]["CRZ_ACTIVE"] == 1
+    ret.cruiseState.available = cp_cam.vl["CRZ_CTRL"]["CRZ_AVAILABLE"] == 1
+    ret.cruiseState.enabled = cp.vl["CRZ_EVENTS"]["CRUISE_ACTIVE_CAR_MOVING"] == 1
     ret.cruiseState.speed = cp.vl["CRZ_EVENTS"]["CRZ_SPEED"] * CV.KPH_TO_MS
 
     # On if no driver torque the last 5 seconds
@@ -109,6 +109,9 @@ class CarState(CarStateBase):
     self.cam_laneinfo = cp_cam.vl["CAM_LANEINFO"]
     self.crz_btns_counter = cp.vl["CRZ_BTNS"]["CTR"]
     ret.steerError = cp_cam.vl["CAM_LKAS"]["ERR_BIT_1"] == 1
+
+    self.cp_cam = cp_cam
+    self.cp = cp
 
     return ret
 
@@ -142,8 +145,7 @@ class CarState(CarStateBase):
         ("LKAS_BLOCK", "STEER_RATE", 0),
         ("LKAS_TRACK_STATE", "STEER_RATE", 0),
         ("HANDS_OFF_5_SECONDS", "STEER_RATE", 0),
-        ("CRZ_ACTIVE", "CRZ_CTRL", 0),
-        ("CRZ_AVAILABLE", "CRZ_CTRL", 0),
+        ("CRUISE_ACTIVE_CAR_MOVING", "CRZ_EVENTS", 0),
         ("CRZ_SPEED", "CRZ_EVENTS", 0),
         ("STANDSTILL", "PEDALS", 0),
         ("BRAKE_ON", "PEDALS", 0),
@@ -163,7 +165,7 @@ class CarState(CarStateBase):
 
       checks += [
         ("ENGINE_DATA", 100),
-        ("CRZ_CTRL", 50),
+        
         ("CRZ_EVENTS", 50),
         ("CRZ_BTNS", 10),
         ("PEDALS", 50),
@@ -219,11 +221,81 @@ class CarState(CarStateBase):
         ("S1", "CAM_LANEINFO", 0),
         ("S1_HBEAM", "CAM_LANEINFO", 0),
       ]
-
+      
       checks += [
         # sig_address, frequency
         ("CAM_LANEINFO", 2),
         ("CAM_LKAS", 16),
+      ]
+
+      signals += [
+        ("CRZ_ACTIVE", "CRZ_CTRL", 0),
+        ("CRZ_AVAILABLE", "CRZ_CTRL", 0),
+        ("DISTANCE_SETTING", "CRZ_CTRL", 0),
+        ("ACC_ACTIVE_2", "CRZ_CTRL", 0),
+        ("DISABLE_TIMER_1", "CRZ_CTRL", 0),
+        ("DISABLE_TIMER_2", "CRZ_CTRL", 0),
+        ("NEW_SIGNAL_1", "CRZ_CTRL", 0),
+        ("NEW_SIGNAL_2", "CRZ_CTRL", 0),
+        ("NEW_SIGNAL_3", "CRZ_CTRL", 0),
+        ("NEW_SIGNAL_4", "CRZ_CTRL", 0),
+        ("NEW_SIGNAL_5", "CRZ_CTRL", 0),
+        ("NEW_SIGNAL_6", "CRZ_CTRL", 0),
+      ]
+      signals += [
+        ("STATUS", "CRZ_INFO", 0),
+        ("STATIC_1", "CRZ_INFO", 0),
+        ("ACCEL_CMD", "CRZ_INFO", 0),
+        ("CRZ_ENDED", "CRZ_INFO", 0),
+        ("ACC_SET_ALLOWED", "CRZ_INFO", 0),
+        ("ACC_ACTIVE", "CRZ_INFO", 0),
+        ("MYSTERY_BIT", "CRZ_INFO", 0),
+        ("CTR1", "CRZ_INFO", 0),
+        ("CHECKSUM", "CRZ_INFO", 0),
+      ]
+      signals += [
+        ("DISTANCE_LEAD", "RADAR_361", 0),
+        ("RELATIVE_VEL_LEAD", "RADAR_361", 0),
+        ("STATIC_1", "RADAR_361", 0),
+        ("DISTANCE_RELATED", "RADAR_361", 0),
+        ("STATIC_2", "RADAR_361", 0),
+        ("SPEED_INVERSE", "RADAR_361", 0),
+        ("IS_MOVING", "RADAR_361", 0),
+        ("CTR", "RADAR_361", 0),
+      ]
+      signals += [
+        ("STEER_ANGLE", "RADAR_362", 0),
+        ("STATIC_1", "RADAR_362", 0),
+        ("STATIC_2", "RADAR_362", 0),
+        ("STATIC_3", "RADAR_362", 0),
+        ("CTR", "RADAR_362", 0),
+      ]
+      signals += [
+        ("STATIC_1", "RADAR_363", 0),
+        ("STATIC_2", "RADAR_363", 0),
+      ]
+      signals += [
+        ("STATIC_1", "RADAR_364", 0),
+        ("STATIC_2", "RADAR_364", 0),
+      ]
+      signals += [
+        ("STATIC_1", "RADAR_365", 0),
+        ("STATIC_2", "RADAR_365", 0),
+      ]
+      signals += [
+        ("STATIC_1", "RADAR_366", 0),
+        ("STATIC_2", "RADAR_366", 0),
+      ]
+      checks += [
+        ("CRZ_CTRL", 50), # Not blocked in panda            0x21BC
+        ("CRZ_INFO", 50), # Blocked in panda                0x21B
+        ("RADAR_361", 10), #                           0x361
+        ("RADAR_362", 10),  #                               0x362
+        ("RADAR_363", 10), # Likely containes radar tracks  0x363
+        ("RADAR_364", 10), # Likely containes radar tracks  0x364
+        ("RADAR_365", 10), #                                0x365
+        ("RADAR_366", 10), #                                0x366
+        #("RADAR_499_STATIC", 10), #                         0x499
       ]
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 2)

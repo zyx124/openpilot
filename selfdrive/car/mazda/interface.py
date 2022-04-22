@@ -28,9 +28,11 @@ class CarInterface(CarInterfaceBase):
 
     ret.dashcamOnly = False # candidate not in [CAR.CX9_2021]
 
-    #ret.enableTorqueInterceptor = 0x24A in fingerprint[0]
-    if ret.enableTorqueInterceptor:
-      print("Recieving torque interceptor signal.")
+    ret.openpilotLongitudinalControl = True
+    ret.longitudinalTuning.kpBP = [0., 10.]
+    ret.longitudinalTuning.kpV = [.5, 0.3,]
+    ret.longitudinalTuning.kiBP = [0.]
+    ret.longitudinalTuning.kiV = [0.06]
 
     ret.steerActuatorDelay = 0.1
     ret.steerRateCost = 1.0

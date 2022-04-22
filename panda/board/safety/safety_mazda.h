@@ -201,6 +201,14 @@ static int mazda_fwd_hook(int bus, CANPacket_t *to_fwd) {
   } else if (bus == MAZDA_CAM) {
     block |= (addr == MAZDA_LKAS);
     block |= (addr == MAZDA_LKAS_HUD);
+    block |= (addr == MAZDA_CRZ_INFO);
+    block |= (addr == MAZDA_CRZ_CTRL);
+    block |= (addr == MAZDA_RADAR_361);
+    block |= (addr == MAZDA_RADAR_362);
+    block |= (addr == MAZDA_RADAR_363);
+    block |= (addr == MAZDA_RADAR_364);
+    block |= (addr == MAZDA_RADAR_365);
+    block |= (addr == MAZDA_RADAR_366);
 
     if (!block) {
       bus_fwd = MAZDA_MAIN;

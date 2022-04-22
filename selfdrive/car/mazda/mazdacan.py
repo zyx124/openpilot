@@ -132,14 +132,14 @@ def create_button_cmd(packer, car_fingerprint, counter, button):
 
     return packer.make_can_msg("CRZ_BTNS", 0, values)
 
-def create_radar_command(packer, car_fingerprint, frame, actuators, enabled, cp_cam, cp, cs):
+def create_radar_command(packer, car_fingerprint, frame, c, CS):
   RI.active = True
   accel = 0
-  radar_accel = int(cp_cam.vl["CRZ_INFO"]["ACCEL_CMD"]) # get stock accel command. dbc offset should be applied already.
+  radar_accel = int(CS.cp_cam.vl["CRZ_INFO"]["ACCEL_CMD"]) # get stock accel command. dbc offset should be applied already.
   ret = []
 
   # request low speed mode transition
-  if cs.speed < 30: #kmh
+  if CS.speed_kph < 30:
     if not RI.low_speed_mode:
       RI.reset = True # request reset of PID loop 
       RI.radar_accel = radar_accel # save radar accel value to have a smooth transition into low speed mode
@@ -152,36 +152,36 @@ def create_radar_command(packer, car_fingerprint, frame, actuators, enabled, cp_
 
   # after we have transitioned to low speed mode, we use the vision only accel command
   if RI.low_speed_mode: # this is set true in longcontrol.py
-    accel = actuators.accel * 2000
+    accel = c.actuators.accel * 2000
     clip(accel, -4000, 1000)
   else:
     accel = radar_accel
 
   if car_fingerprint in GEN1:
     values_21B = {
-        "ACC_ACTIVE"        : int(enabled),
-        "ACC_SET_ALLOWED"   : int(bool(int(cp.vl["GEAR"]["GEAR"]) & 4)), # we can set ACC_SET_ALLOWED bit when in drive. Allows crz to be set from 1kmh.
+        "ACC_ACTIVE"        : int(c.enabled),
+        "ACC_SET_ALLOWED"   : int(bool(int(CS.cp.vl["GEAR"]["GEAR"]) & 4)), # we can set ACC_SET_ALLOWED bit when in drive. Allows crz to be set from 1kmh.
         "CRZ_ENDED"         : 0, # this should keep acc on down to 5km/h on my 2018 M3
         "ACCEL_CMD"         : accel,
-        "STATIC_1"          : int(cp_cam.vl["CRZ_INFO"]["STATIC_1"]), #0x7FF,
-        "STATUS"            : int(cp_cam.vl["CRZ_INFO"]["STATUS"]),    #1
-        "MYSTERY_BIT"       : int(cp_cam.vl["CRZ_INFO"]["MYSTERY_BIT"]),
-        "CTR1"              : int(cp_cam.vl["CRZ_INFO"]["CTR1"])
+        "STATIC_1"          : int(CS.cp_cam.vl["CRZ_INFO"]["STATIC_1"]), #0x7FF,
+        "STATUS"            : int(CS.cp_cam.vl["CRZ_INFO"]["STATUS"]),    #1
+        "MYSTERY_BIT"       : int(CS.cp_cam.vl["CRZ_INFO"]["MYSTERY_BIT"]),
+        "CTR1"              : int(CS.cp_cam.vl["CRZ_INFO"]["CTR1"])
     }
 
     values_21C = {
-        "CRZ_ACTIVE"       : int(enabled),
-        "CRZ_AVAILABLE"    : int(cp_cam.vl["CRZ_CTRL"]["CRZ_AVAILABLE"]),
-        "DISTANCE_SETTING" : int(cp_cam.vl["CRZ_CTRL"]["DISTANCE_SETTING"]),
-        "ACC_ACTIVE_2"     : int(enabled),
+        "CRZ_ACTIVE"       : int(c.enabled),
+        "CRZ_AVAILABLE"    : int(CS.cp_cam.vl["CRZ_CTRL"]["CRZ_AVAILABLE"]),
+        "DISTANCE_SETTING" : int(CS.cp_cam.vl["CRZ_CTRL"]["DISTANCE_SETTING"]),
+        "ACC_ACTIVE_2"     : int(c.enabled),
         "DISABLE_TIMER_1"  : 0,
         "DISABLE_TIMER_2"  : 0,
-        "NEW_SIGNAL_1"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_1"]),
-        "NEW_SIGNAL_2"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_2"]),
-        "NEW_SIGNAL_3"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_3"]),
-        "NEW_SIGNAL_4"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_4"]),
-        "NEW_SIGNAL_5"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_5"]),
-        "NEW_SIGNAL_6"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_6"]),
+        "NEW_SIGNAL_1"     : int(CS.cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_1"]),
+        "NEW_SIGNAL_2"     : int(CS.cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_2"]),
+        "NEW_SIGNAL_3"     : int(CS.cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_3"]),
+        "NEW_SIGNAL_4"     : int(CS.cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_4"]),
+        "NEW_SIGNAL_5"     : int(CS.cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_5"]),
+        "NEW_SIGNAL_6"     : int(CS.cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_6"]),
     }
 
     ret.append(packer.make_can_msg("CRZ_INFO", 0, values_21B))
@@ -189,41 +189,41 @@ def create_radar_command(packer, car_fingerprint, frame, actuators, enabled, cp_
 
     if (frame % 10 == 0):
       values_361 = {
-        "CTR"               : int(cp_cam.vl["RADAR_361"]["CTR"]),
-        "SPEED_INVERSE"     : int(cp_cam.vl["RADAR_361"]["SPEED_INVERSE"]),
-        "IS_MOVING"         : int(cp_cam.vl["RADAR_361"]["IS_MOVING"]),
-        "DISTANCE_LEAD"     : int(cp_cam.vl["RADAR_361"]["DISTANCE_LEAD"]),   
-        "DISTANCE_RELATED"  : int(cp_cam.vl["RADAR_361"]["DISTANCE_RELATED"]),
-        "RELATIVE_VEL_LEAD" : int(cp_cam.vl["RADAR_361"]["RELATIVE_VEL_LEAD"]),
-        "STATIC_1"          : int(cp_cam.vl["RADAR_361"]["STATIC_1"]),
-        "STATIC_2"          : int(cp_cam.vl["RADAR_361"]["STATIC_2"])
+        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
+        "SPEED_INVERSE"     : int(CS.cp_cam.vl["RADAR_361"]["SPEED_INVERSE"]),
+        "IS_MOVING"         : int(CS.cp_cam.vl["RADAR_361"]["IS_MOVING"]),
+        "DISTANCE_LEAD"     : int(CS.cp_cam.vl["RADAR_361"]["DISTANCE_LEAD"]),   
+        "DISTANCE_RELATED"  : int(CS.cp_cam.vl["RADAR_361"]["DISTANCE_RELATED"]),
+        "RELATIVE_VEL_LEAD" : int(CS.cp_cam.vl["RADAR_361"]["RELATIVE_VEL_LEAD"]),
+        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_361"]["STATIC_1"]),
+        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_361"]["STATIC_2"])
       }
       values_362 = {
-        "CTR"               : int(cp_cam.vl["RADAR_361"]["CTR"]),
-        "STEER_ANGLE"       : int(cp_cam.vl["RADAR_362"]["STEER_ANGLE"]),
-        "STATIC_1"          : int(cp_cam.vl["RADAR_362"]["STATIC_1"]),
-        "STATIC_2"          : int(cp_cam.vl["RADAR_362"]["STATIC_2"]),
-        "STATIC_3"          : int(cp_cam.vl["RADAR_362"]["STATIC_3"])
+        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
+        "STEER_ANGLE"       : int(CS.cp_cam.vl["RADAR_362"]["STEER_ANGLE"]),
+        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_362"]["STATIC_1"]),
+        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_362"]["STATIC_2"]),
+        "STATIC_3"          : int(CS.cp_cam.vl["RADAR_362"]["STATIC_3"])
       }
       values_363 = {
-        "CTR"               : int(cp_cam.vl["RADAR_361"]["CTR"]),
-        "STATIC_1"          : int(cp_cam.vl["RADAR_363"]["STATIC_1"]),
-        "STATIC_2"          : int(cp_cam.vl["RADAR_363"]["STATIC_2"])
+        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
+        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_363"]["STATIC_1"]),
+        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_363"]["STATIC_2"])
       }
       values_364 = {
-        "CTR"               : int(cp_cam.vl["RADAR_361"]["CTR"]),
-        "STATIC_1"          : int(cp_cam.vl["RADAR_364"]["STATIC_1"]),
-        "STATIC_2"          : int(cp_cam.vl["RADAR_364"]["STATIC_2"])
+        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
+        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_364"]["STATIC_1"]),
+        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_364"]["STATIC_2"])
       }
       values_365 = {
-        "CTR"               : int(cp_cam.vl["RADAR_361"]["CTR"]),
-        "STATIC_1"          : int(cp_cam.vl["RADAR_365"]["STATIC_1"]),
-        "STATIC_2"          : int(cp_cam.vl["RADAR_365"]["STATIC_2"])
+        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
+        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_365"]["STATIC_1"]),
+        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_365"]["STATIC_2"])
       }
       values_366 = {
-        "CTR"               : int(cp_cam.vl["RADAR_361"]["CTR"]),
-        "STATIC_1"          : int(cp_cam.vl["RADAR_366"]["STATIC_1"]),
-        "STATIC_2"          : int(cp_cam.vl["RADAR_366"]["STATIC_2"])
+        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
+        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_366"]["STATIC_1"]),
+        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_366"]["STATIC_2"])
       }
 
       ret.append(packer.make_can_msg("RADAR_361", 0, values_361))

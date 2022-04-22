@@ -74,4 +74,8 @@ class CarController():
     can_sends.append(mazdacan.create_steering_control(self.packer, CS.CP.carFingerprint,
                                                         frame, apply_steer, CS.cam_lkas))
 
+    """ACC RADAR COMMAND"""                                                    
+    if frame % 2 == 0:
+      can_sends.extend(mazdacan.create_radar_command(self.packer, CS.CP.carFingerprint, frame, c, CS))
+
     return can_sends
