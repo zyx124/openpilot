@@ -19,6 +19,7 @@ unsigned int honda_checksum(unsigned int address, uint64_t d, int l);
 unsigned int toyota_checksum(unsigned int address, uint64_t d, int l);
 unsigned int subaru_checksum(unsigned int address, uint64_t d, int l);
 unsigned int chrysler_checksum(unsigned int address, uint64_t d, int l);
+uint8_t mazda_checksum(uint64_t data);
 void init_crc_lookup_tables();
 unsigned int volkswagen_crc(unsigned int address, uint64_t d, int l);
 unsigned int pedal_checksum(uint64_t d, int l);
