@@ -270,7 +270,7 @@ class CarState(CarStateBase):
         ("NEW_SIGNAL_2","RADAR_362", 0),
         ("NEW_SIGNAL_1","RADAR_362", 0),
         ("OBJ_DIST","RADAR_362", 0),
-        ("OBJ_ANG ","RADAR_362", 0),
+        ("OBJ_ANG","RADAR_362", 0),
         ("OBJ_RVEL","RADAR_362", 0),
       ]
       signals += [
