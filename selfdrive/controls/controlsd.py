@@ -239,8 +239,6 @@ class Controls:
       else:
         self.events.add(EventName.calibrationInvalid)
 
-    
-
     # Handle lane change
     if self.sm['lateralPlan'].laneChangeState == LaneChangeState.preLaneChange:
       direction = self.sm['lateralPlan'].laneChangeDirection
@@ -256,8 +254,8 @@ class Controls:
                                                  LaneChangeState.laneChangeFinishing]:
       self.events.add(EventName.laneChange)
 
-    if self.can_rcv_error or not CS.canValid:
-      self.events.add(EventName.canError)
+    #if self.can_rcv_error or not CS.canValid:
+      #self.events.add(EventName.canError)
 
     for i, pandaState in enumerate(self.sm['pandaStates']):
       # All pandas must match the list of safetyConfigs, and if outside this list, must be silent or noOutput
