@@ -202,13 +202,20 @@ def create_radar_command(packer, car_fingerprint, frame, c, CS):
         "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
         "STEER_ANGLE"       : int(CS.cp_cam.vl["RADAR_362"]["STEER_ANGLE"]),
         "STATIC_1"          : int(CS.cp_cam.vl["RADAR_362"]["STATIC_1"]),
-        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_362"]["STATIC_2"]),
-        "STATIC_3"          : int(CS.cp_cam.vl["RADAR_362"]["STATIC_3"])
+        "FLIPPY_1"          : int(CS.cp_cam.vl["RADAR_362"]["FLIPPY_1"]),
+        "NEW_SIGNAL_1"      : int(CS.cp_cam.vl["RADAR_362"]["NEW_SIGNAL_1"]),
+        "NEW_SIGNAL_2"      : int(CS.cp_cam.vl["RADAR_362"]["NEW_SIGNAL_2"]),
+        "OBJ_DIST"          : int(CS.cp_cam.vl["RADAR_362"]["OBJ_DIST"]),
+        "OBJ_ANG"           : int(CS.cp_cam.vl["RADAR_362"]["OBJ_ANG"]),
+        "OBJ_RVEL"          : int(CS.cp_cam.vl["RADAR_362"]["OBJ_RVEL"]),
       }
       values_363 = {
         "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
         "STATIC_1"          : int(CS.cp_cam.vl["RADAR_363"]["STATIC_1"]),
-        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_363"]["STATIC_2"])
+        "OBJ_DIST"          : int(CS.cp_cam.vl["RADAR_363"]["OBJ_DIST"]),
+        "OBJ_ANG"           : int(CS.cp_cam.vl["RADAR_363"]["OBJ_ANG"]),
+        "OBJ_RELV"          : int(CS.cp_cam.vl["RADAR_363"]["OBJ_RELV"]),
+        "NEW_SIGNAL_1"      : int(CS.cp_cam.vl["RADAR_363"]["NEW_SIGNAL_1"]),
       }
       values_364 = {
         "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),

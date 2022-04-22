@@ -108,7 +108,7 @@ class CarState(CarStateBase):
     self.cam_lkas = cp_cam.vl["CAM_LKAS"]
     self.cam_laneinfo = cp_cam.vl["CAM_LANEINFO"]
     self.crz_btns_counter = cp.vl["CRZ_BTNS"]["CTR"]
-    ret.steerError = cp_cam.vl["CAM_LKAS"]["ERR_BIT_1"] == 1
+    ret.steerError = False
 
     self.cp_cam = cp_cam
     self.cp = cp
@@ -265,14 +265,20 @@ class CarState(CarStateBase):
       ]
       signals += [
         ("STEER_ANGLE", "RADAR_362", 0),
-        ("STATIC_1", "RADAR_362", 0),
+        ("FLIPPY_1","RADAR_362", 0),
         ("STATIC_2", "RADAR_362", 0),
-        ("STATIC_3", "RADAR_362", 0),
-        ("CTR", "RADAR_362", 0),
+        ("NEW_SIGNAL_2","RADAR_362", 0),
+        ("NEW_SIGNAL_1","RADAR_362", 0),
+        ("OBJ_DIST","RADAR_362", 0),
+        ("OBJ_ANG ","RADAR_362", 0),
+        ("OBJ_RVEL","RADAR_362", 0),
       ]
       signals += [
         ("STATIC_1", "RADAR_363", 0),
-        ("STATIC_2", "RADAR_363", 0),
+        ("OBJ_DIST", "RADAR_363", 0),
+        ("OBJ_ANG", "RADAR_363", 0),
+        ("OBJ_RELV", "RADAR_363", 0),
+        ("NEW_SIGNAL_1", "RADAR_363", 0),
       ]
       signals += [
         ("STATIC_1", "RADAR_364", 0),

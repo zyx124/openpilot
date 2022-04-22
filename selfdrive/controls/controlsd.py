@@ -671,7 +671,7 @@ class Controls:
     controlsState.cumLagMs = -self.rk.remaining * 1000.
     controlsState.startMonoTime = int(start_time * 1e9)
     controlsState.forceDecel = bool(force_decel)
-    controlsState.canErrorCounter = self.can_error_counter
+    controlsState.canErrorCounter = 0
 
     if self.joystick_mode:
       controlsState.lateralControlState.debugState = lac_log

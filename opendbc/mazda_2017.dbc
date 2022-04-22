@@ -552,9 +552,12 @@ BO_ 870 RADAR_366: 8 XXX
  SG_ CTR : 59|4@0+ (1,0) [0|15] "" XXX
 
 BO_ 867 RADAR_363: 8 XXX
- SG_ STATIC_1 : 7|32@0+ (1,0) [0|4294967295] "" XXX
- SG_ STATIC_2 : 39|7@0+ (1,0) [0|127] "" XXX
- SG_ CTR : 59|4@0+ (1,0) [0|15] "" XXX
+ SG_ CTR : 59|4@0+ (1,0) [0|255] "" XXX
+ SG_ STATIC_1 : 43|16@0+ (1,0) [0|255] "" XXX
+ SG_ OBJ_DIST : 7|12@0+ (1,0) [0|255] "" XXX
+ SG_ OBJ_ANG : 11|12@0- (1,0) [0|255] "" XXX
+ SG_ OBJ_RELV : 31|12@0- (1,0) [0|255] "" XXX
+ SG_ NEW_SIGNAL_1 : 35|8@0+ (1,0) [0|15] "" XXX
 
 BO_ 868 RADAR_364: 8 XXX
  SG_ STATIC_1 : 7|32@0+ (1,0) [0|4294967295] "" XXX
@@ -567,11 +570,15 @@ BO_ 869 RADAR_365: 8 XXX
  SG_ CTR : 59|4@0+ (1,0) [0|15] "" XXX
 
 BO_ 866 RADAR_362: 8 XXX
- SG_ STATIC_1 : 7|32@0+ (1,0) [0|4294967295] "" XXX
- SG_ STATIC_2 : 36|3@0+ (1,0) [0|7] "" XXX
- SG_ STATIC_3 : 33|4@0+ (1,0) [0|15] "" XXX
- SG_ STEER_ANGLE : 43|12@0- (1,0) [0|4095] "" XXX
  SG_ CTR : 59|4@0+ (1,0) [0|15] "" XXX
+ SG_ STEER_ANGLE : 43|12@0+ (-1,2048) [0|7] "" XXX
+ SG_ STATIC_2 : 63|4@0+ (1,0) [0|15] "" XXX
+ SG_ FLIPPY_1 : 44|1@0+ (1,0) [0|15] "" XXX
+ SG_ NEW_SIGNAL_1 : 34|3@1+ (1,0) [0|3] "" XXX
+ SG_ NEW_SIGNAL_2 : 33|4@0+ (1,0) [0|3] "" XXX
+ SG_ OBJ_DIST : 7|12@0+ (1,0) [0|131071] "" XXX
+ SG_ OBJ_ANG : 11|12@0- (1,0) [0|127] "" XXX
+ SG_ OBJ_RVEL : 31|11@0- (1,0) [0|63] "" XXX
 
 BO_ 121 EPB: 8 XXX
  SG_ NEW_SIGNAL_1 : 4|4@0+ (1,0) [0|255] "" XXX
