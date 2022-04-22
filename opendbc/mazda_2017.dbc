@@ -572,7 +572,7 @@ BO_ 869 RADAR_365: 8 XXX
 BO_ 866 RADAR_362: 8 XXX
  SG_ CTR : 59|4@0+ (1,0) [0|15] "" XXX
  SG_ STEER_ANGLE : 43|12@0+ (-1,2048) [0|7] "" XXX
- SG_ STATIC_2 : 63|4@0+ (1,0) [0|15] "" XXX
+ SG_ STATIC_1 : 63|4@0+ (1,0) [0|15] "" XXX
  SG_ FLIPPY_1 : 44|1@0+ (1,0) [0|15] "" XXX
  SG_ NEW_SIGNAL_1 : 34|3@1+ (1,0) [0|3] "" XXX
  SG_ NEW_SIGNAL_2 : 33|4@0+ (1,0) [0|3] "" XXX
