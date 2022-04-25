@@ -55,18 +55,23 @@ class Processor():
         # print('ubloxGnss', sm['ubloxGnss'])
         if sm.updated['ubloxGnss']:
           # print("sm['ubloxGnss'].measurementReport", sm['ubloxGnss'].measurementReport)
-          report = sm['ubloxGnss'].measurementReport
 
-          # With internet: uses dog
-          if len(report.measurements) > 0:
-            new_meas = read_raw_ublox(report)
-            new_meas = [m for m in new_meas if helpers.get_constellation(m.prn) == 'GPS']
-            measurements.extend(new_meas)
-            self.process(measurements)
+          print(sm['ubloxGnss'])
+          # Can also be ephephines
+          if sm['ubloxGnss'].measurementReport:
+            report = sm['ubloxGnss']
+            report = report.measurementReport
 
-            recv_time = GPSTime(report.gpsWeek, report.rcvTow)
-            print(recv_time.as_datetime())
-            measurements_t.append(recv_time.as_datetime())
+            # With internet: uses dog
+            if len(report.measurements) > 0:
+              new_meas = read_raw_ublox(report)
+              new_meas = [m for m in new_meas if helpers.get_constellation(m.prn) == 'GPS']
+              measurements.extend(new_meas)
+              self.process(measurements)
+
+              recv_time = GPSTime(report.gpsWeek, report.rcvTow)
+              print(recv_time.as_datetime())
+              measurements_t.append(recv_time.as_datetime())
 
 
 if __name__ == "__main__":
