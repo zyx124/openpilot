@@ -186,58 +186,16 @@ def create_radar_command(packer, car_fingerprint, frame, c, CS):
 
     ret.append(packer.make_can_msg("CRZ_INFO", 0, values_21B))
     ret.append(packer.make_can_msg("CRZ_CTRL", 0, values_21C))
-
+ 
     if (frame % 10 == 0):
-      values_361 = {
-        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
-        "SPEED_INVERSE"     : int(CS.cp_cam.vl["RADAR_361"]["SPEED_INVERSE"]),
-        "IS_MOVING"         : int(CS.cp_cam.vl["RADAR_361"]["IS_MOVING"]),
-        "DISTANCE_LEAD"     : int(CS.cp_cam.vl["RADAR_361"]["DISTANCE_LEAD"]),   
-        "DISTANCE_RELATED"  : int(CS.cp_cam.vl["RADAR_361"]["DISTANCE_RELATED"]),
-        "RELATIVE_VEL_LEAD" : int(CS.cp_cam.vl["RADAR_361"]["RELATIVE_VEL_LEAD"]),
-        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_361"]["STATIC_1"]),
-        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_361"]["STATIC_2"])
-      }
-      values_362 = {
-        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
-        "STEER_ANGLE"       : int(CS.cp_cam.vl["RADAR_362"]["STEER_ANGLE"]),
-        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_362"]["STATIC_1"]),
-        "FLIPPY_1"          : int(CS.cp_cam.vl["RADAR_362"]["FLIPPY_1"]),
-        "NEW_SIGNAL_1"      : int(CS.cp_cam.vl["RADAR_362"]["NEW_SIGNAL_1"]),
-        "NEW_SIGNAL_2"      : int(CS.cp_cam.vl["RADAR_362"]["NEW_SIGNAL_2"]),
-        "OBJ_DIST"          : int(CS.cp_cam.vl["RADAR_362"]["OBJ_DIST"]),
-        "OBJ_ANG"           : int(CS.cp_cam.vl["RADAR_362"]["OBJ_ANG"]),
-        "OBJ_RVEL"          : int(CS.cp_cam.vl["RADAR_362"]["OBJ_RVEL"]),
-      }
-      values_363 = {
-        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
-        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_363"]["STATIC_1"]),
-        "OBJ_DIST"          : int(CS.cp_cam.vl["RADAR_363"]["OBJ_DIST"]),
-        "OBJ_ANG"           : int(CS.cp_cam.vl["RADAR_363"]["OBJ_ANG"]),
-        "OBJ_RELV"          : int(CS.cp_cam.vl["RADAR_363"]["OBJ_RELV"]),
-        "NEW_SIGNAL_1"      : int(CS.cp_cam.vl["RADAR_363"]["NEW_SIGNAL_1"]),
-      }
-      values_364 = {
-        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
-        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_364"]["STATIC_1"]),
-        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_364"]["STATIC_2"])
-      }
-      values_365 = {
-        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
-        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_365"]["STATIC_1"]),
-        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_365"]["STATIC_2"])
-      }
-      values_366 = {
-        "CTR"               : int(CS.cp_cam.vl["RADAR_361"]["CTR"]),
-        "STATIC_1"          : int(CS.cp_cam.vl["RADAR_366"]["STATIC_1"]),
-        "STATIC_2"          : int(CS.cp_cam.vl["RADAR_366"]["STATIC_2"])
-      }
-
-      ret.append(packer.make_can_msg("RADAR_361", 0, values_361))
-      ret.append(packer.make_can_msg("RADAR_362", 0, values_362))
-      ret.append(packer.make_can_msg("RADAR_363", 0, values_363))
-      ret.append(packer.make_can_msg("RADAR_364", 0, values_364))
-      ret.append(packer.make_can_msg("RADAR_365", 0, values_365))
-      ret.append(packer.make_can_msg("RADAR_366", 0, values_366))
+      for addr in range(361,367):
+        addr_name = f"RADAR_{addr}"
+        msg = CS.cp_cam.vl[addr_name]
+        values = {
+          "MSGS" : int(msg["MSGS"]),
+          "MSGS" : int(msg["MSGS"]),
+          "CTR"      : int(msg["CTR"])
+        } 
+        ret.append(packer.make_can_msg(addr_name, 0, values))
     
   return ret

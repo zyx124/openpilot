@@ -24,7 +24,7 @@ class CarInterface(CarInterfaceBase):
     ret.carName = "mazda"
 
     ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda)]
-    ret.radarOffCan = True
+    ret.radarOffCan = False
 
     ret.dashcamOnly = False # candidate not in [CAR.CX9_2021]
 

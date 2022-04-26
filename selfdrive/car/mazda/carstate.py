@@ -253,55 +253,14 @@ class CarState(CarStateBase):
         ("CTR1", "CRZ_INFO", 0),
         ("CHECKSUM", "CRZ_INFO", 0),
       ]
-      signals += [
-        ("DISTANCE_LEAD", "RADAR_361", 0),
-        ("RELATIVE_VEL_LEAD", "RADAR_361", 0),
-        ("STATIC_1", "RADAR_361", 0),
-        ("DISTANCE_RELATED", "RADAR_361", 0),
-        ("STATIC_2", "RADAR_361", 0),
-        ("SPEED_INVERSE", "RADAR_361", 0),
-        ("IS_MOVING", "RADAR_361", 0),
-        ("CTR", "RADAR_361", 0),
-      ]
-      signals += [
-        ("STEER_ANGLE", "RADAR_362", 0),
-        ("FLIPPY_1","RADAR_362", 0),
-        ("STATIC_1", "RADAR_362", 0),
-        ("NEW_SIGNAL_2","RADAR_362", 0),
-        ("NEW_SIGNAL_1","RADAR_362", 0),
-        ("OBJ_DIST","RADAR_362", 0),
-        ("OBJ_ANG","RADAR_362", 0),
-        ("OBJ_RVEL","RADAR_362", 0),
-      ]
-      signals += [
-        ("STATIC_1", "RADAR_363", 0),
-        ("OBJ_DIST", "RADAR_363", 0),
-        ("OBJ_ANG", "RADAR_363", 0),
-        ("OBJ_RELV", "RADAR_363", 0),
-        ("NEW_SIGNAL_1", "RADAR_363", 0),
-      ]
-      signals += [
-        ("STATIC_1", "RADAR_364", 0),
-        ("STATIC_2", "RADAR_364", 0),
-      ]
-      signals += [
-        ("STATIC_1", "RADAR_365", 0),
-        ("STATIC_2", "RADAR_365", 0),
-      ]
-      signals += [
-        ("STATIC_1", "RADAR_366", 0),
-        ("STATIC_2", "RADAR_366", 0),
-      ]
-      checks += [
-        ("CRZ_CTRL", 50), # Not blocked in panda            0x21BC
-        ("CRZ_INFO", 50), # Blocked in panda                0x21B
-        ("RADAR_361", 10), #                           0x361
-        ("RADAR_362", 10),  #                               0x362
-        ("RADAR_363", 10), # Likely containes radar tracks  0x363
-        ("RADAR_364", 10), # Likely containes radar tracks  0x364
-        ("RADAR_365", 10), #                                0x365
-        ("RADAR_366", 10), #                                0x366
-        #("RADAR_499_STATIC", 10), #                         0x499
-      ]
+    
+      for addr in range(361,367):
+        msg = f"RADAR_{addr}"
+        signals += [
+          ("MSGS_1", msg),
+          ("MSGS_2", msg),
+          ("CTR", msg),
+        ]
+        checks += [(msg, 10)]
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 2)

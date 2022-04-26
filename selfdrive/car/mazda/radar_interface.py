@@ -53,7 +53,7 @@ class RadarInterface(RadarInterfaceBase):
       ret.errors = errors
 
       for addr in range(361,367):
-        msg = self.rcp.vl[f"RADAR_{addr}"]
+        msg = self.rcp.vl[f"RADAR_TRACK_{addr}"]
         if addr not in self.pts:
           self.pts[addr] = car.RadarData.RadarPoint.new_message()
           self.pts[addr].trackId = self.track_id
