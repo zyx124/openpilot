@@ -264,7 +264,7 @@ FW_VERSIONS = {
 DBC = {
   CAR.CX5: dbc_dict('mazda_2017', None),
   CAR.CX9: dbc_dict('mazda_2017', None),
-  CAR.MAZDA3: dbc_dict('mazda_2017', None),
+  CAR.MAZDA3: dbc_dict('mazda_2017', "mazda_radar"),
   CAR.MAZDA6: dbc_dict('mazda_2017', None),
   CAR.CX9_2021: dbc_dict('mazda_2017', None),
 }
