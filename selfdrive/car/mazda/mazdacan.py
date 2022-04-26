@@ -192,9 +192,9 @@ def create_radar_command(packer, car_fingerprint, frame, c, CS):
         addr_name = f"RADAR_{addr}"
         msg = CS.cp_cam.vl[addr_name]
         values = {
-          "MSGS" : int(msg["MSGS"]),
-          "MSGS" : int(msg["MSGS"]),
-          "CTR"      : int(msg["CTR"])
+          "MSGS_1" : int(msg["MSGS_1"]),
+          "MSGS_2" : int(msg["MSGS_2"]),
+          "CTR"    : int(msg["CTR"])
         } 
         ret.append(packer.make_can_msg(addr_name, 0, values))
     
