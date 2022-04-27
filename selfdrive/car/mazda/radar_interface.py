@@ -15,9 +15,9 @@ def get_radar_can_parser(CP):
   for addr in range(361,367):
     msg = f"RADAR_TRACK_{addr}"
     signals += [
-      ("ANG_OBJ", msg),
-      ("DIST_OBJ", msg),
-      ("RELV_OBJ", msg),
+      ("ANG_OBJ", msg, 0),
+      ("DIST_OBJ", msg, 0),
+      ("RELV_OBJ", msg, 0),
     ]
     checks += [(msg, 10)]
   return CANParser(DBC[CP.carFingerprint]['radar'], signals, checks, 2)

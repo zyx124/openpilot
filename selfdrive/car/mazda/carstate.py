@@ -257,9 +257,9 @@ class CarState(CarStateBase):
       for addr in range(361,367):
         msg = f"RADAR_{addr}"
         signals += [
-          ("MSGS_1", msg),
-          ("MSGS_2", msg),
-          ("CTR", msg),
+          ("MSGS_1", msg, 0),
+          ("MSGS_2", msg, 0),
+          ("CTR", msg, 0),
         ]
         checks += [(msg, 10)]
 
