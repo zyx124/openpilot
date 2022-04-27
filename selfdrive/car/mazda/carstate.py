@@ -253,6 +253,8 @@ class CarState(CarStateBase):
         ("CTR1", "CRZ_INFO", 0),
         ("CHECKSUM", "CRZ_INFO", 0),
       ]
+
+      checks += [("CRZ_CTRL",50), ("CRZ_INFO",50)]
     
       for addr in range(361,367):
         msg = f"RADAR_{addr}"
