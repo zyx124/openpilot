@@ -33,6 +33,7 @@ class CANBUS:
 
 class DBC_FILES:
   mqb = "vw_mqb_2010"  # Used for all cars with MQB-style CAN messaging
+  pq46 = "vw_golf_mk4"
 
 DBC = defaultdict(lambda: dbc_dict(DBC_FILES.mqb, None))  # type: Dict[str, Dict[str, str]]
 
@@ -86,6 +87,7 @@ class CAR:
   SKODA_SCALA_MK1 = "SKODA SCALA 1ST GEN"           # Chassis NW, Mk1 Skoda Scala and Skoda Kamiq
   SKODA_SUPERB_MK3 = "SKODA SUPERB 3RD GEN"         # Chassis 3V/NP, Mk3 Skoda Superb and variants
   SKODA_OCTAVIA_MK3 = "SKODA OCTAVIA 3RD GEN"       # Chassis NE, Mk3 Skoda Octavia and variants
+  GENERICPQ = "VOLKSWAGEN PQ35/PQ46/NMS GEN"
 
 # All supported cars should return FW from the engine, srs, eps, and fwdRadar. Cars
 # with a manual trans won't return transmission firmware, but all other cars will.
@@ -786,3 +788,5 @@ FW_VERSIONS = {
     ],
   },
 }
+
+PQ_CARS = {CAR.GENERICPQ}
