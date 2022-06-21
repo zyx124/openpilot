@@ -32,6 +32,7 @@ class CarInterfaceBase(ABC):
     self.steering_unpressed = 0
     self.low_speed_alert = False
     self.silent_steer_warning = True
+    self.CP.enableTorqueInterceptor = False
 
     if CarState is not None:
       self.CS = CarState(CP)
@@ -99,9 +100,6 @@ class CarInterfaceBase(ABC):
     ret.longitudinalActuatorDelayLowerBound = 0.15
     ret.longitudinalActuatorDelayUpperBound = 0.15
     ret.steerLimitTimer = 1.0
-
-    # No Torque Interceptor by default
-    ret.enableTorqueInterceptor = False
 
     return ret
 
