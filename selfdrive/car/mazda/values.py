@@ -4,21 +4,21 @@ Ecu = car.CarParams.Ecu
 
 # Steer torque limits
 class CarControllerParams:
-  STEER_MAX = 600                # theoretical max_steer 2047
-  STEER_DELTA_UP = 10             # torque increase per refresh
-  STEER_DELTA_DOWN = 25           # torque decrease per refresh
-  STEER_DRIVER_ALLOWANCE = 5    # allowed driver torque before start limiting
+  STEER_MAX = 600                  # theoretical max_steer 2047
+  STEER_DELTA_UP = 10              # torque increase per refresh
+  STEER_DELTA_DOWN = 25            # torque decrease per refresh
+  STEER_DRIVER_ALLOWANCE = 5       # allowed driver torque before start limiting
   STEER_DRIVER_MULTIPLIER = 40     # weight driver torque
-  STEER_DRIVER_FACTOR = 1         # from dbc
-  STEER_ERROR_MAX = 350           # max delta between torque cmd and torque motor
+  STEER_DRIVER_FACTOR = 1          # from dbc
+  STEER_ERROR_MAX = 350            # max delta between torque cmd and torque motor
 
-  TI_STEER_MAX = 600                # theoretical max_steer 2047
-  TI_STEER_DELTA_UP = 6             # torque increase per refresh
-  TI_STEER_DELTA_DOWN = 15           # torque decrease per refresh
+  TI_STEER_MAX = 600               # theoretical max_steer 2047
+  TI_STEER_DELTA_UP = 6            # torque increase per refresh
+  TI_STEER_DELTA_DOWN = 15         # torque decrease per refresh
   TI_STEER_DRIVER_ALLOWANCE = 5    # allowed driver torque before start limiting
-  TI_STEER_DRIVER_MULTIPLIER = 40     # weight driver torque
-  TI_STEER_DRIVER_FACTOR = 1         # from dbc
-  TI_STEER_ERROR_MAX = 350           # max delta between torque cmd and torque motor
+  TI_STEER_DRIVER_MULTIPLIER = 40  # weight driver torque
+  TI_STEER_DRIVER_FACTOR = 1       # from dbc
+  TI_STEER_ERROR_MAX = 350         # max delta between torque cmd and torque motor
 
 
 class TI_STATE:
@@ -79,6 +79,7 @@ FW_VERSIONS = {
       b'KJ01-3210X-J-00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'KJ01-3210X-M-00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'K319-3210X-A-00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'K070-3210X-C-00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.engine, 0x7e0, None): [
       b'PA53-188K2-A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
@@ -96,6 +97,8 @@ FW_VERSIONS = {
       b'PX42-188K2-C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'PX68-188K2-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'SHKT-188K2-D\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'PSJ5-188K2-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'SH7P-188K2-F\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.fwdRadar, 0x764, None): [
       b'K123-67XK2-F\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
@@ -104,12 +107,14 @@ FW_VERSIONS = {
       b'K131-67XK2-C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'K131-67XK2-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'K131-67XK2-F\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'G46L-67XA1-C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.esp, 0x760, None): [
       b'K123-437K2-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'KBJ5-437K2-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'KL2K-437K2-A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'KN0W-437K2-C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'KA0G-437AS-0-03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.fwdCamera, 0x706, None): [
       b'B61L-67XK2-R\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
@@ -120,6 +125,7 @@ FW_VERSIONS = {
       b'GSH7-67XK2-M\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'GSH7-67XK2-N\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'GSH7-67XK2-R\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'GMG6-67XK2-F\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.transmission, 0x7e1, None): [
       b'PA66-21PS1-A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
@@ -136,6 +142,8 @@ FW_VERSIONS = {
       b'PYB2-21PS1-H\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'PYNC-21PS1-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'SH9T-21PS1-D\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'PS53-21PS1-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'SH6S-21PS1-D\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', 
     ],
   },
 
@@ -192,7 +200,6 @@ FW_VERSIONS = {
       b'BHN1-3210X-J-00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'K070-3210X-C-00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'KR11-3210X-K-00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
-
     ],
     (Ecu.engine, 0x7e0, None): [
       b'P5JD-188K2-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
