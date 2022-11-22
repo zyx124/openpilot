@@ -1,52 +1,53 @@
 import copy
 
-from selfdrive.car.mazda.values import GEN1, Buttons
+from selfdrive.car.mazda.values import GEN1, GEN2, Buttons
 
 
 def create_steering_control(packer, car_fingerprint, frame, apply_steer, lkas):
-
-  tmp = apply_steer + 2048
-
-  lo = tmp & 0xFF
-  hi = tmp >> 8
-
-  # copy values from camera
-  b1 = int(lkas["BIT_1"])
-  er1 = int(lkas["ERR_BIT_1"])
-  lnv = 0
-  ldw = 0
-  er2 = int(lkas["ERR_BIT_2"])
-
-  # Some older models do have these, newer models don't.
-  # Either way, they all work just fine if set to zero.
-  steering_angle = 0
-  b2 = 0
-
-  tmp = steering_angle + 2048
-  ahi = tmp >> 10
-  amd = (tmp & 0x3FF) >> 2
-  amd = (amd >> 4) | (( amd & 0xF) << 4)
-  alo = (tmp & 0x3) << 2
-
-  ctr = frame % 16
-  # bytes:     [    1  ] [ 2 ] [             3               ]  [           4         ]
-  csum = 249 - ctr - hi - lo - (lnv << 3) - er1 - (ldw << 7) - ( er2 << 4) - (b1 << 5)
-
-  # bytes      [ 5 ] [ 6 ] [    7   ]
-  csum = csum - ahi - amd - alo - b2
-
-  if ahi == 1:
-    csum = csum + 15
-
-  if csum < 0:
-    if csum < -256:
-      csum = csum + 512
-    else:
-      csum = csum + 256
-
-  csum = csum % 256
-
   if car_fingerprint in GEN1:
+    tmp = apply_steer + 2048
+
+    lo = tmp & 0xFF
+    hi = tmp >> 8
+
+    # copy values from camera
+    b1 = int(lkas["BIT_1"])
+    er1 = int(lkas["ERR_BIT_1"])
+    lnv = 0
+    ldw = 0
+    er2 = int(lkas["ERR_BIT_2"])
+
+    # Some older models do have these, newer models don't.
+    # Either way, they all work just fine if set to zero.
+    steering_angle = 0
+    b2 = 0
+
+    tmp = steering_angle + 2048
+    ahi = tmp >> 10
+    amd = (tmp & 0x3FF) >> 2
+    amd = (amd >> 4) | (( amd & 0xF) << 4)
+    alo = (tmp & 0x3) << 2
+
+    ctr = frame % 16
+    # bytes:     [    1  ] [ 2 ] [             3               ]  [           4         ]
+    csum = 249 - ctr - hi - lo - (lnv << 3) - er1 - (ldw << 7) - ( er2 << 4) - (b1 << 5)
+
+    # bytes      [ 5 ] [ 6 ] [    7   ]
+    csum = csum - ahi - amd - alo - b2
+
+    if ahi == 1:
+      csum = csum + 15
+
+    if csum < 0:
+      if csum < -256:
+        csum = csum + 512
+      else:
+        csum = csum + 256
+
+    csum = csum % 256
+
+    bus = 0
+    sig_name = "CAM_LKAS"
     values = {
       "LKAS_REQUEST": apply_steer,
       "CTR": ctr,
@@ -60,7 +61,12 @@ def create_steering_control(packer, car_fingerprint, frame, apply_steer, lkas):
       "CHKSUM": csum
     }
 
-  return packer.make_can_msg("CAM_LKAS", 0, values)
+  elif car_fingerprint in GEN2:
+    bus = 1
+    sig_name = "EPS_LKAS"
+    values = {}
+
+  return packer.make_can_msg(sig_name, bus, values)
 
 
 def create_alert_command(packer, cam_msg: dict, ldw: bool, steer_required: bool):
@@ -117,3 +123,26 @@ def create_button_cmd(packer, car_fingerprint, counter, button):
     }
 
     return packer.make_can_msg("CRZ_BTNS", 0, values)
+
+
+def create_acc_cmd(self, packer, cp, accel):
+  cmd = cp.vl["ACC"]["ACCEL_CMD"]
+
+  if (cp.vl["ACC"]["ACC_ENABLED"]):
+    cmd = (accel * 200) + 2000
+
+  values = {
+    "ACCEL_CMD": cmd,
+    "ACC_ENABLED": cp.vl["ACC"]["ACC_ENABLED"],
+    "ACC_ENABLED_2": cp.vl["ACC"]["ACC_ENABLED_2"],
+    "NEW_SIGNAL_1": cp.vl["ACC"]["NEW_SIGNAL_1"],
+    "NEW_SIGNAL_2": cp.vl["ACC"]["NEW_SIGNAL_2"],
+    "NEW_SIGNAL_3": cp.vl["ACC"]["NEW_SIGNAL_3"],
+    "NEW_SIGNAL_4": cp.vl["ACC"]["NEW_SIGNAL_4"],
+    "NEW_SIGNAL_5": cp.vl["ACC"]["NEW_SIGNAL_5"],
+    "NEW_SIGNAL_6": cp.vl["ACC"]["NEW_SIGNAL_6"],
+    "NEW_SIGNAL_7": cp.vl["ACC"]["NEW_SIGNAL_7"],
+    "NEW_SIGNAL_8": cp.vl["ACC"]["NEW_SIGNAL_8"],
+  }
+
+  return packer.make_can_msg("ACC", 2, values)
