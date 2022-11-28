@@ -56,7 +56,7 @@ class CarController:
     
     elif CS.CP.carFingerprint in GEN2:
       if self.frame % 2 == 0:
-        can_sends.append(mazdacan.create_acc_cmd(self, self.packer, CS.cp, CC.actuators.accel))
+        can_sends.extend(mazdacan.create_acc_cmd(self, self.packer))
     
     # send steering command
     can_sends.append(mazdacan.create_steering_control(self.packer, self.CP.carFingerprint,

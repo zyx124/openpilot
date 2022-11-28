@@ -125,24 +125,83 @@ def create_button_cmd(packer, car_fingerprint, counter, button):
     return packer.make_can_msg("CRZ_BTNS", 0, values)
 
 
-def create_acc_cmd(self, packer, cp, accel):
-  cmd = cp.vl["ACC"]["ACCEL_CMD"]
+def create_acc_cmd(self, packer):
+  ret = []
+  cp = self.CP.cp
+  cp_cam = self.CP.cp_cam
+  cc = self.CC
+  accel = self.CC.actuators.accel
 
-  if (cp.vl["ACC"]["ACC_ENABLED"]):
-    cmd = (accel * 200) + 2000
+  if self.CP.carFingerprint in GEN1:
+    bus = 0
+    if cc.longActive:
+      accel = accel * 1170
+      accel = accel if accel < 1000 else 1000
+    else:
+      accel = int(cp_cam.vl["CRZ_INFO"]["ACCEL_CMD"]) # pass through
+    
+    values_21B = {
+        "ACC_ACTIVE"        : int(cc.longActive),
+        "ACC_SET_ALLOWED"   : int(bool(int(cp.vl["GEAR"]["GEAR"]) & 4)), # we can set ACC_SET_ALLOWED bit when in drive. Allows crz to be set from 1kmh.
+        "CRZ_ENDED"         : 0, # this should keep acc on down to 5km/h on my 2018 M3
+        "ACCEL_CMD"         : accel,
+        "STATIC_1"          : int(cp_cam.vl["CRZ_INFO"]["STATIC_1"]), #0x7FF,
+        "STATUS"            : int(cp_cam.vl["CRZ_INFO"]["STATUS"]),    #1
+        "MYSTERY_BIT"       : int(cp_cam.vl["CRZ_INFO"]["MYSTERY_BIT"]),
+        "CTR1"              : int(cp_cam.vl["CRZ_INFO"]["CTR1"])
+    }
 
-  values = {
-    "ACCEL_CMD": cmd,
-    "ACC_ENABLED": cp.vl["ACC"]["ACC_ENABLED"],
-    "ACC_ENABLED_2": cp.vl["ACC"]["ACC_ENABLED_2"],
-    "NEW_SIGNAL_1": cp.vl["ACC"]["NEW_SIGNAL_1"],
-    "NEW_SIGNAL_2": cp.vl["ACC"]["NEW_SIGNAL_2"],
-    "NEW_SIGNAL_3": cp.vl["ACC"]["NEW_SIGNAL_3"],
-    "NEW_SIGNAL_4": cp.vl["ACC"]["NEW_SIGNAL_4"],
-    "NEW_SIGNAL_5": cp.vl["ACC"]["NEW_SIGNAL_5"],
-    "NEW_SIGNAL_6": cp.vl["ACC"]["NEW_SIGNAL_6"],
-    "NEW_SIGNAL_7": cp.vl["ACC"]["NEW_SIGNAL_7"],
-    "NEW_SIGNAL_8": cp.vl["ACC"]["NEW_SIGNAL_8"],
-  }
+    values_21C = {
+        "CRZ_ACTIVE"       : int(cc.longActive),
+        "CRZ_AVAILABLE"    : int(cp_cam.vl["CRZ_CTRL"]["CRZ_AVAILABLE"]),
+        "DISTANCE_SETTING" : int(cp_cam.vl["CRZ_CTRL"]["DISTANCE_SETTING"]),
+        "ACC_ACTIVE_2"     : int(cc.longActive),
+        "DISABLE_TIMER_1"  : 0,
+        "DISABLE_TIMER_2"  : 0,
+        "NEW_SIGNAL_1"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_1"]),
+        "NEW_SIGNAL_2"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_2"]),
+        "NEW_SIGNAL_3"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_3"]),
+        "NEW_SIGNAL_4"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_4"]),
+        "NEW_SIGNAL_5"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_5"]),
+        "NEW_SIGNAL_6"     : int(cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_6"]),
+    }
 
-  return packer.make_can_msg("ACC", 2, values)
+    ret.append(packer.make_can_msg("CRZ_INFO", 0, values_21B))
+    ret.append(packer.make_can_msg("CRZ_CTRL", 0, values_21C))
+
+    if (self.frame % 10 == 0):
+      for addr in range(361,367):
+        addr_name = f"RADAR_{addr}"
+        msg = cp_cam.vl[addr_name]
+        values = {
+          "MSGS_1" : int(msg["MSGS_1"]),
+          "MSGS_2" : int(msg["MSGS_2"]),
+          "CTR"    : int(msg["CTR"])
+        } 
+        ret.append(packer.make_can_msg(addr_name, 0, values))
+
+  elif self.CP.carFingerprint in GEN2:
+    msg_name = "ACC"
+    bus = 2
+
+    cmd = cp.vl["ACC"]["ACCEL_CMD"]
+
+    if (cp.vl["ACC"]["ACC_ENABLED"]):
+      cmd = (accel * 200) + 2000
+
+    values = {
+      "ACCEL_CMD": cmd,
+      "ACC_ENABLED": cp.vl["ACC"]["ACC_ENABLED"],
+      "ACC_ENABLED_2": cp.vl["ACC"]["ACC_ENABLED_2"],
+      "NEW_SIGNAL_1": cp.vl["ACC"]["NEW_SIGNAL_1"],
+      "NEW_SIGNAL_2": cp.vl["ACC"]["NEW_SIGNAL_2"],
+      "NEW_SIGNAL_3": cp.vl["ACC"]["NEW_SIGNAL_3"],
+      "NEW_SIGNAL_4": cp.vl["ACC"]["NEW_SIGNAL_4"],
+      "NEW_SIGNAL_5": cp.vl["ACC"]["NEW_SIGNAL_5"],
+      "NEW_SIGNAL_6": cp.vl["ACC"]["NEW_SIGNAL_6"],
+      "NEW_SIGNAL_7": cp.vl["ACC"]["NEW_SIGNAL_7"],
+      "NEW_SIGNAL_8": cp.vl["ACC"]["NEW_SIGNAL_8"],
+    }
+    ret.append(packer.make_can_msg(msg_name, bus, values))
+
+  return ret
