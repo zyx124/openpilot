@@ -64,7 +64,9 @@ def create_steering_control(packer, car_fingerprint, frame, apply_steer, lkas):
   elif car_fingerprint in GEN2:
     bus = 1
     sig_name = "EPS_LKAS"
-    values = {}
+    values = {
+      "LKAS_REQUEST": apply_steer,
+    }
 
   return packer.make_can_msg(sig_name, bus, values)
 
