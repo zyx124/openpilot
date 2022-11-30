@@ -72,7 +72,7 @@ CAR_INFO: Dict[str, Union[MazdaCarInfo, List[MazdaCarInfo]]] = {
 
 
 class LKAS_LIMITS:
-  STEER_THRESHOLD = 15
+  STEER_THRESHOLD = 1500
   DISABLE_SPEED = 45    # kph
   ENABLE_SPEED = 52     # kph
 
