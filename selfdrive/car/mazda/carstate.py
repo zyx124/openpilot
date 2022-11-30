@@ -139,7 +139,7 @@ class CarState(CarStateBase):
       ret.cruiseState.speed = cp.vl["CRUZE_STATE"]["CRZ_SPEED"] * CV.KPH_TO_MS
       self.cam_lkas = 1
       self.cam_laneinfo = 1
-      ret.cruiseState.enabled = cp.vl["CRUZE_STATE"]["CRZ_ENABLED"] == 1
+      ret.cruiseState.enabled = ( (cp.vl["CRUZE_STATE"]["CRZ_ENABLED"] == 1) or (cp.vl["CRUZE_STATE"]["PRE_ENABLE"] == 1) )
       self.acc_active_last = ret.cruiseState.enabled
       self.crz_btns_counter = cp.vl["CRZ_BTNS"]["CTR"]
 
@@ -222,6 +222,7 @@ class CarState(CarStateBase):
       signals += [
         ("CRZ_SPEED", "CRUZE_STATE", 0),
         ("CRZ_ENABLED", "CRUZE_STATE", 0),
+        ("PRE_ENABLE", "CRUZE_STATE", 0),
         ("BRAKE_PEDAL_PRESSED", "BRAKE_PEDAL", 0),
         ("SET_P", "CRZ_BTNS",0),
         ("SET_M", "CRZ_BTNS",0),
