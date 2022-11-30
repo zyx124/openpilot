@@ -189,7 +189,7 @@ def create_acc_cmd(self, packer, CS, CC):
     cmd = cp.vl["ACC"]["ACCEL_CMD"]
 
     if (cp.vl["ACC"]["ACC_ENABLED"]):
-      cmd = (accel * 200) + 2048
+      cmd = (accel * 300) + 2000
 
     values = {
       "ACCEL_CMD": cmd,
