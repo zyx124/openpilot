@@ -154,6 +154,8 @@ class CarState(CarStateBase):
 
   @staticmethod
   def get_can_parser(CP):
+    signals = []
+    checks = []
     if CP.carFingerprint not in GEN2:
       signals = [
         # sig_name, sig_address
@@ -216,46 +218,46 @@ class CarState(CarStateBase):
         ("BSM", 10),
       ]
 
-      if CP.carFingerprint in GEN2:
-        signals += [
-          ("CRZ_SPEED", "CRUZE_STATE", 0),
-          ("CRZ_ENABLED", "CRUZE_STATE", 0),
-          ("BRAKE_PEDAL_PRESSED", "BRAKE_PEDAL", 0),
-          ("SET_P", "CRZ_BTNS",0),
-          ("SET_M", "CRZ_BTNS",0),
-          ("RES", "CRZ_BTNS",0),
-          ("CAN", "CRZ_BTNS",0),
-          ("MODE_ACC", "CRZ_BTNS",0),
-          ("MODE_LKAS", "CRZ_BTNS",0),
-          ("DISTANCE_P", "CRZ_BTNS",0),
-          ("DISTANCE_M", "CRZ_BTNS",0),
-          ("STATIC_0", "CRZ_BTNS",0),
-          ("STATIC_1", "CRZ_BTNS",0),
-          ("STATIC_2", "CRZ_BTNS",0),
-          ("CTR", "CRZ_BTNS", 0),
-          ("LEFT_BLINK", "BLINK_INFO", 0),
-          ("RIGHT_BLINK", "BLINK_INFO", 0),
-          ("ACCEL_CMD", "ACC", 0),
-          ("NEW_SIGNAL_1", "ACC", 0),
-          ("NEW_SIGNAL_2", "ACC", 0),
-          ("NEW_SIGNAL_3", "ACC", 0),
-          ("NEW_SIGNAL_4", "ACC", 0),
-          ("NEW_SIGNAL_5", "ACC", 0),
-          ("NEW_SIGNAL_6", "ACC", 0),
-          ("NEW_SIGNAL_7", "ACC", 0),
-          ("NEW_SIGNAL_8", "ACC", 0),
-          ("ACC_ENABLED", "ACC", 0),
-          ("ACC_ENABLED_2", "ACC", 0),
-          ("CHECKSUM", "ACC", 0), 
-        ]
+    if CP.carFingerprint in GEN2:
+      signals += [
+        ("CRZ_SPEED", "CRUZE_STATE", 0),
+        ("CRZ_ENABLED", "CRUZE_STATE", 0),
+        ("BRAKE_PEDAL_PRESSED", "BRAKE_PEDAL", 0),
+        ("SET_P", "CRZ_BTNS",0),
+        ("SET_M", "CRZ_BTNS",0),
+        ("RES", "CRZ_BTNS",0),
+        ("CAN", "CRZ_BTNS",0),
+        ("MODE_ACC", "CRZ_BTNS",0),
+        ("MODE_LKAS", "CRZ_BTNS",0),
+        ("DISTANCE_P", "CRZ_BTNS",0),
+        ("DISTANCE_M", "CRZ_BTNS",0),
+        ("STATIC_0", "CRZ_BTNS",0),
+        ("STATIC_1", "CRZ_BTNS",0),
+        ("STATIC_2", "CRZ_BTNS",0),
+        ("CTR", "CRZ_BTNS", 0),
+        ("LEFT_BLINK", "BLINK_INFO", 0),
+        ("RIGHT_BLINK", "BLINK_INFO", 0),
+        ("ACCEL_CMD", "ACC", 0),
+        ("NEW_SIGNAL_1", "ACC", 0),
+        ("NEW_SIGNAL_2", "ACC", 0),
+        ("NEW_SIGNAL_3", "ACC", 0),
+        ("NEW_SIGNAL_4", "ACC", 0),
+        ("NEW_SIGNAL_5", "ACC", 0),
+        ("NEW_SIGNAL_6", "ACC", 0),
+        ("NEW_SIGNAL_7", "ACC", 0),
+        ("NEW_SIGNAL_8", "ACC", 0),
+        ("ACC_ENABLED", "ACC", 0),
+        ("ACC_ENABLED_2", "ACC", 0),
+        ("CHECKSUM", "ACC", 0), 
+      ]
 
-        checks += [
-          ("BRAKE_PEDAL", 20),
-          ("CRUZE_STATE", 10),
-          ("BLINK_INFO", 10),
-          ("ACC", 50),
-          ("CRZ_BTNS", 10),
-        ]
+      checks += [
+        ("BRAKE_PEDAL", 20),
+        ("CRUZE_STATE", 10),
+        ("BLINK_INFO", 10),
+        ("ACC", 50),
+        ("CRZ_BTNS", 10),
+      ]
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 0)
 

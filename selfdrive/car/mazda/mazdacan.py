@@ -125,12 +125,12 @@ def create_button_cmd(packer, car_fingerprint, counter, button):
     return packer.make_can_msg("CRZ_BTNS", 0, values)
 
 
-def create_acc_cmd(self, packer):
+def create_acc_cmd(self, packer, CS, CC):
   ret = []
-  cp = self.CP.cp
-  cp_cam = self.CP.cp_cam
-  cc = self.CC
-  accel = self.CC.actuators.accel
+  cp = CS.cp
+  cp_cam = CS.cp_cam
+  cc = CC
+  accel = CC.actuators.accel
 
   if self.CP.carFingerprint in GEN1:
     bus = 0
