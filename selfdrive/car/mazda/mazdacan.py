@@ -203,6 +203,12 @@ def create_acc_cmd(self, packer, CS, CC):
       "NEW_SIGNAL_6": cp.vl["ACC"]["NEW_SIGNAL_6"],
       "NEW_SIGNAL_7": cp.vl["ACC"]["NEW_SIGNAL_7"],
       "NEW_SIGNAL_8": cp.vl["ACC"]["NEW_SIGNAL_8"],
+      "NEW_SIGNAL_9": cp.vl["ACC"]["NEW_SIGNAL_9"],
+      "NEW_SIGNAL_10": cp.vl["ACC"]["NEW_SIGNAL_10"],
+      "NEW_SIGNAL_11": cp.vl["ACC"]["NEW_SIGNAL_11"],
+      "NEW_SIGNAL_12": cp.vl["ACC"]["NEW_SIGNAL_12"],
+      "NEW_SIGNAL_13": cp.vl["ACC"]["NEW_SIGNAL_13"],
+      "NEW_SIGNAL_14": cp.vl["ACC"]["NEW_SIGNAL_14"],
     }
     ret.append(packer.make_can_msg(msg_name, bus, values))
 
