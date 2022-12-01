@@ -42,7 +42,7 @@ class CarInterface(CarInterfaceBase):
       ret.steerRatio = 15.5
     elif candidate in CAR.MAZDA3_2019:
       ret.openpilotLongitudinalControl = True
-      ret.stopAccel = -3.0
+      ret.stopAccel = 0.0
       ret.longitudinalTuning.kpBP = [0., 5., 35.]
       ret.longitudinalTuning.kpV = [1.2, 0.8, 0.5]
       ret.longitudinalTuning.kiBP = [0., 35.]
