@@ -15,6 +15,7 @@ from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX, apply_center_dead
 from selfdrive.controls.lib.events import Events
 from selfdrive.controls.lib.vehicle_model import VehicleModel
 
+
 ButtonType = car.CarState.ButtonEvent.Type
 GearShifter = car.CarState.GearShifter
 EventName = car.CarEvent.EventName

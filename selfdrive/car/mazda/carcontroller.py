@@ -3,6 +3,8 @@ from opendbc.can.packer import CANPacker
 from selfdrive.car import apply_std_steer_torque_limits
 from selfdrive.car.mazda import mazdacan
 from selfdrive.car.mazda.values import CarControllerParams, Buttons, GEN1, GEN2
+from selfdrive.car.car_helpers import DT
+
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
@@ -15,11 +17,18 @@ class CarController:
     self.brake_counter = 0
     self.frame = 0
     self.params = CarControllerParams(self.CP)
+    self.ts_last = 0
+    # create long duration timers
+    self.hold_timer = DT(6.0)
+    self.resume_timer = DT(0.5)
 
   def update(self, CC, CS):
     can_sends = []
 
     apply_steer = 0
+    
+    #update the timer
+    DT.tick()
 
     if CC.latActive:
       # calculate steer and also set limits due to driver torque
@@ -55,8 +64,18 @@ class CarController:
         can_sends.append(mazdacan.create_alert_command(self.packer, CS.cam_laneinfo, ldw, steer_required))
     
     elif CS.CP.carFingerprint in GEN2:
+      resume = False
+      hold = False
       if self.frame % 2 == 0:
-        can_sends.extend(mazdacan.create_acc_cmd(self, self.packer, CS, CC))
+        if CS.out.standstill and not (CC.cruiseControl.resume or CC.cruiseControl.override):
+          hold = self.hold_timer.active()
+        #elif CC.cruiseControl.resume:
+          #resume = self.resume_timer.active()
+        else :
+          DT.reset_all()
+        resume = (CC.cruiseControl.resume or CC.cruiseControl.override) if CS.out.standstill else False
+
+        can_sends.extend(mazdacan.create_acc_cmd(self, self.packer, CS, CC, hold, resume))
     
     # send steering command
     can_sends.append(mazdacan.create_steering_control(self.packer, self.CP.carFingerprint,
@@ -69,3 +88,4 @@ class CarController:
 
     self.frame += 1
     return new_actuators, can_sends
+

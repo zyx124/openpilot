@@ -127,7 +127,7 @@ def create_button_cmd(packer, car_fingerprint, counter, button):
     return packer.make_can_msg("CRZ_BTNS", 0, values)
 
 
-def create_acc_cmd(self, packer, CS, CC):
+def create_acc_cmd(self, packer, CS, CC, hold, resume):
   ret = []
   cp = CS.cp
   cp_cam = CS.cp_cam
@@ -190,11 +190,17 @@ def create_acc_cmd(self, packer, CS, CC):
 
     if (cp.vl["ACC"]["ACC_ENABLED"]):
       cmd = (accel * 300) + 2000
+    else:
+      cmd = cp.vl["ACC"]["ACCEL_CMD"]
+      hold = cp.vl["ACC"]["HOLD"]
+      resume = cp.vl["ACC"]["RESUME"]
 
     values = {
       "ACCEL_CMD": cmd,
       "ACC_ENABLED": cp.vl["ACC"]["ACC_ENABLED"],
       "ACC_ENABLED_2": cp.vl["ACC"]["ACC_ENABLED_2"],
+      "HOLD": hold,
+      "RESUME": resume,
       "NEW_SIGNAL_1": cp.vl["ACC"]["NEW_SIGNAL_1"],
       "NEW_SIGNAL_2": cp.vl["ACC"]["NEW_SIGNAL_2"],
       "NEW_SIGNAL_3": cp.vl["ACC"]["NEW_SIGNAL_3"],
@@ -208,7 +214,6 @@ def create_acc_cmd(self, packer, CS, CC):
       "NEW_SIGNAL_11": cp.vl["ACC"]["NEW_SIGNAL_11"],
       "NEW_SIGNAL_12": cp.vl["ACC"]["NEW_SIGNAL_12"],
       "NEW_SIGNAL_13": cp.vl["ACC"]["NEW_SIGNAL_13"],
-      "NEW_SIGNAL_14": cp.vl["ACC"]["NEW_SIGNAL_14"],
     }
     ret.append(packer.make_can_msg(msg_name, bus, values))
 

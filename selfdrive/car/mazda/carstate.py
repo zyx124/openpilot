@@ -145,6 +145,7 @@ class CarState(CarStateBase):
 
       speed_kph = cp_cam.vl["SPEED"]["SPEED"] * CV.KPH_TO_MS
       ret.standstill = speed_kph < .1
+      ret.cruiseState.standstill = ret.standstill
       self.cp = cp
       self.cp_cam = cp_cam
 
@@ -239,6 +240,8 @@ class CarState(CarStateBase):
         ("LEFT_BLINK", "BLINK_INFO", 0),
         ("RIGHT_BLINK", "BLINK_INFO", 0),
         ("ACCEL_CMD", "ACC", 0),
+        ("HOLD", "ACC", 0),
+        ("RESUME", "ACC", 0),
         ("NEW_SIGNAL_1", "ACC", 0),
         ("NEW_SIGNAL_2", "ACC", 0),
         ("NEW_SIGNAL_3", "ACC", 0),
@@ -252,7 +255,6 @@ class CarState(CarStateBase):
         ("NEW_SIGNAL_11", "ACC", 0),
         ("NEW_SIGNAL_12", "ACC", 0),
         ("NEW_SIGNAL_13", "ACC", 0),
-        ("NEW_SIGNAL_14", "ACC", 0),
         ("ACC_ENABLED", "ACC", 0),
         ("ACC_ENABLED_2", "ACC", 0),
         ("CHECKSUM", "ACC", 0), 

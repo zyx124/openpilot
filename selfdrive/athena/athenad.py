@@ -346,11 +346,11 @@ def uploadFileToUrl(fn, url, headers):
     "fn": fn,
     "url": url,
     "headers": headers,
-  }])
+  }], True)
 
 
 @dispatcher.add_method
-def uploadFilesToUrls(files_data):
+def uploadFilesToUrls(files_data, allow_metered=True):
   items = []
   failed = []
   for file in files_data:
@@ -375,7 +375,7 @@ def uploadFilesToUrls(files_data):
       headers=file.get('headers', {}),
       created_at=int(time.time() * 1000),
       id=None,
-      allow_cellular=file.get('allow_cellular', False),
+      allow_cellular=file.get('allow_cellular', False) if not allow_metered else True,
     )
     upload_id = hashlib.sha1(str(item).encode()).hexdigest()
     item = item._replace(id=upload_id)
@@ -487,8 +487,9 @@ def getNetworkType():
 
 @dispatcher.add_method
 def getNetworkMetered():
-  network_type = HARDWARE.get_network_type()
-  return HARDWARE.get_network_metered(network_type)
+  #network_type = HARDWARE.get_network_type()
+  #return HARDWARE.get_network_metered(network_type)
+  return False
 
 
 @dispatcher.add_method
