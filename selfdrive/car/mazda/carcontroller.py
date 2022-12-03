@@ -3,11 +3,63 @@ from opendbc.can.packer import CANPacker
 from selfdrive.car import apply_std_steer_torque_limits
 from selfdrive.car.mazda import mazdacan
 from selfdrive.car.mazda.values import CarControllerParams, Buttons, GEN1, GEN2
-from selfdrive.car.car_helpers import DT
+from common.realtime import DT_CTRL
+from typing import List
 
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
+class DT:
+  """ Used to create long duration timer objects\n
+  Example usage: timer_obj = DT(duration=31540000.01) # create a timer object with a duration of 1 year + 10ms\n
+  ret = timer_obj.active() # Poll this. Returns true if time since last reset is less than duration \n
+  DT.tick(DT_CTRL) # call this function at DT_CTRL frequency (DT_CTRL=0.01s, 100Hz)\n
+  timer_obj.reset() # Resets the timer\n
+  timer_obj.adjust(10.0) # Adjusts the duration of the timer\n
+  timer_obj.once_after_reset() # Returns true only one time after reset\n
+  Resets on overflow at float("inf") or float("-inf") or timer_obj.max or min\n"""
+  objects = [] # type: List[DT]
+  def __init__(self, duration=0) -> None:
+    self.duration = duration
+    self.was_reset = False
+    self.timer = 0
+    self.min = float("-inf") # type: float
+    self.max = float("inf") # type: float
+    self.__class__.objects.append(self)
+
+  @classmethod
+  def tick(cls, dt=DT_CTRL) -> None:
+    """Call this every frame DT_CTRL=0.01s.\n
+    Resets on overflow at float("inf") or float("-inf") """
+    for obj in cls.objects:
+      obj.timer += dt
+      # reset on overflow
+      obj.reset() if (obj.timer == (obj.max or obj.min)) else None
+
+  @classmethod
+  def reset_all(cls) -> None:
+    """Resets timer for all DT objects"""
+    for obj in cls.objects:
+      obj.reset()
+
+  def reset(self) -> None:
+    """Resets this objects timer"""
+    self.timer = 0
+    self.was_reset = True
+
+  def active(self) -> bool:
+    """Returns true if time since last reset is less than duration"""
+    return bool(self.timer <= self.duration)
+
+  def adjust(self, duration) -> None:
+    """Adjusts the duration of the timer"""
+    self.duration = duration
+
+  def once_after_reset(self) -> bool: 
+    """Returns true only one time after calling reset()"""
+    ret = self.was_reset
+    self.was_reset = False
+    return ret
 
 class CarController:
   def __init__(self, dbc_name, CP, VM):
