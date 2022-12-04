@@ -1,9 +1,10 @@
 import copy
 
 from selfdrive.car.mazda.values import GEN1, GEN2, Buttons
+from common.realtime import ControlsTimer as Timer
 
 
-def create_steering_control(packer, car_fingerprint, frame, apply_steer, lkas):
+def create_steering_control(packer, car_fingerprint, apply_steer, lkas):
   if car_fingerprint in GEN1:
     tmp = apply_steer + 2048
 
@@ -28,7 +29,7 @@ def create_steering_control(packer, car_fingerprint, frame, apply_steer, lkas):
     amd = (amd >> 4) | (( amd & 0xF) << 4)
     alo = (tmp & 0x3) << 2
 
-    ctr = frame % 16
+    ctr = Timer.frame % 16
     # bytes:     [    1  ] [ 2 ] [             3               ]  [           4         ]
     csum = 249 - ctr - hi - lo - (lnv << 3) - er1 - (ldw << 7) - ( er2 << 4) - (b1 << 5)
 
@@ -171,7 +172,7 @@ def create_acc_cmd(self, packer, CS, CC, hold, resume):
     ret.append(packer.make_can_msg("CRZ_INFO", 0, values_21B))
     ret.append(packer.make_can_msg("CRZ_CTRL", 0, values_21C))
 
-    if (self.frame % 10 == 0):
+    if Timer.interval(10):
       for addr in range(361,367):
         addr_name = f"RADAR_{addr}"
         msg = cp_cam.vl[addr_name]

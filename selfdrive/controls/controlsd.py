@@ -5,7 +5,7 @@ from typing import SupportsFloat
 
 from cereal import car, log
 from common.numpy_fast import clip
-from common.realtime import sec_since_boot, config_realtime_process, Priority, Ratekeeper, DT_CTRL
+from common.realtime import sec_since_boot, config_realtime_process, Priority, Ratekeeper, DT_CTRL, ControlsTimer
 from common.profiler import Profiler
 from common.params import Params, put_nonblocking
 import cereal.messaging as messaging
@@ -723,6 +723,7 @@ class Controls:
       self.pm.send('sendcan', can_list_to_can_capnp(can_sends, msgtype='sendcan', valid=CS.canValid))
       CC.actuatorsOutput = self.last_actuators
       self.steer_limited = abs(CC.actuators.steer - CC.actuatorsOutput.steer) > 1e-2
+      ControlsTimer.tick()
 
     force_decel = (self.sm['driverMonitoringState'].awarenessStatus < 0.) or \
                   (self.state == State.softDisabling)
