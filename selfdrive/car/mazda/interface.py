@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from cereal import car
 from common.conversions import Conversions as CV
-from selfdrive.car.mazda.values import CAR, LKAS_LIMITS
+from selfdrive.car.mazda.values import CAR, GEN1, GEN2, CarControllerParams
 from selfdrive.car import STD_CARGO_KG, scale_tire_stiffness, get_safety_config
 from selfdrive.car.interfaces import CarInterfaceBase
 
@@ -13,10 +13,26 @@ class CarInterface(CarInterfaceBase):
   @staticmethod
   def _get_params(ret, candidate, fingerprint, car_fw, experimental_long):
     ret.carName = "mazda"
-    ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda2019)]
-    ret.radarOffCan = True
+    if candidate in GEN1:
+      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda)]
+      ret.dashcamOnly = candidate not in (CAR.CX5_2022, CAR.CX9_2021)
+      if candidate not in (CAR.CX5_2022, ):
+        ret.minSteerSpeed = CarControllerParams.DISABLE_SPEED * CV.KPH_TO_MS
 
-    ret.dashcamOnly = candidate not in (CAR.CX5_2022, CAR.CX9_2021, CAR.MAZDA3_2019, CAR.CX_30, CAR.CX_50, CAR.CX_60, CAR.CX_80, CAR.CX_70, CAR.CX_90)
+    elif candidate in GEN2:
+      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda, 1)]
+      ret.dashcamOnly = candidate not in GEN2
+      ret.openpilotLongitudinalControl = True
+      ret.stopAccel = 0.0
+      ret.longitudinalTuning.kpBP = [0., 5., 35.]
+      ret.longitudinalTuning.kpV = [1.2, 0.8, 0.5]
+      ret.longitudinalTuning.kiBP = [0., 35.]
+      ret.longitudinalTuning.kiV = [0.18, 0.12]
+
+    else:
+      raise ValueError("Unsupported car %s" % candidate)
+
+    ret.radarOffCan = True
 
     ret.steerActuatorDelay = 0.1
     ret.steerLimitTimer = 0.8
@@ -41,12 +57,6 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 2.83
       ret.steerRatio = 15.5
     elif candidate in CAR.MAZDA3_2019:
-      ret.openpilotLongitudinalControl = True
-      ret.stopAccel = 0.0
-      ret.longitudinalTuning.kpBP = [0., 5., 35.]
-      ret.longitudinalTuning.kpV = [1.2, 0.8, 0.5]
-      ret.longitudinalTuning.kiBP = [0., 35.]
-      ret.longitudinalTuning.kiV = [0.18, 0.12]
       ret.mass = 2875 * CV.LB_TO_KG + STD_CARGO_KG
       ret.wheelbase = 2.7
       ret.steerRatio = 14.0
@@ -59,8 +69,6 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 3.1
       ret.steerRatio = 17.6
 
-    if candidate not in (CAR.CX5_2022, CAR.MAZDA3_2019, CAR.CX_30, CAR.CX_50, CAR.CX_60, CAR.CX_80, CAR.CX_70, CAR.CX_90):
-      ret.minSteerSpeed = LKAS_LIMITS.DISABLE_SPEED * CV.KPH_TO_MS
 
     ret.centerToFront = ret.wheelbase * 0.41
 

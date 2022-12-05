@@ -13,6 +13,8 @@ Ecu = car.CarParams.Ecu
 # Steer torque limits
 
 class CarControllerParams:
+  DISABLE_SPEED = 45    # kph
+  ENABLE_SPEED = 52     # kph
   def __init__(self, CP):
     if CP.carFingerprint in GEN1:
       self.STEER_MAX = 800                # theoretical max_steer 2047
@@ -22,6 +24,7 @@ class CarControllerParams:
       self.STEER_DRIVER_MULTIPLIER = 1     # weight driver torque
       self.STEER_DRIVER_FACTOR = 1         # from dbc
       self.STEER_ERROR_MAX = 350           # max delta between torque cmd and torque motor
+      self.STEER_THRESHOLD = 15
     if CP.carFingerprint in GEN2:
       self.STEER_MAX = 8000                 
       self.STEER_DELTA_UP = 45              # torque increase per refresh
@@ -30,6 +33,7 @@ class CarControllerParams:
       self.STEER_DRIVER_MULTIPLIER = 5      # weight driver torque
       self.STEER_DRIVER_FACTOR = 1           # from dbc
       self.STEER_ERROR_MAX = 3500            # max delta between torque cmd and torque motor
+      self.STEER_THRESHOLD = 1500
 
 
 
@@ -69,12 +73,6 @@ CAR_INFO: Dict[str, Union[MazdaCarInfo, List[MazdaCarInfo]]] = {
   CAR.CX_80: MazdaCarInfo("Mazda CX-80 unreleased"),
   CAR.CX_90: MazdaCarInfo("Mazda CX-90 unreleased"),
 }
-
-
-class LKAS_LIMITS:
-  STEER_THRESHOLD = 1500
-  DISABLE_SPEED = 45    # kph
-  ENABLE_SPEED = 52     # kph
 
 
 class Buttons:
