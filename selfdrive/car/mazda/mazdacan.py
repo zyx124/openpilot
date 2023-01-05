@@ -176,7 +176,8 @@ def create_radar_command(packer, car_fingerprint, frame, CC, CS):
         "NEW_SIGNAL_5"     : int(CS.cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_5"]),
         "NEW_SIGNAL_6"     : int(CS.cp_cam.vl["CRZ_CTRL"]["NEW_SIGNAL_6"]),
     }
-
+    print("in mazdacan, packing messages: \r")
+    print(values_21B,values_21C)
     ret.append(packer.make_can_msg("CRZ_INFO", 0, values_21B))
     ret.append(packer.make_can_msg("CRZ_CTRL", 0, values_21C))
  
