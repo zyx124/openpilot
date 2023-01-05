@@ -74,6 +74,11 @@ class LatControlTorque(LatControl):
                                       feedforward=ff,
                                       speed=CS.vEgo,
                                       freeze_integrator=freeze_integrator)
+      
+      if (not self.torque_params.linearTorque) and self.use_steering_angle: # experiment to make steering torque linear.
+        output_torque *= abs(output_torque) # **2 preserve sign
+        angle_compensation = abs(CS.steeringAngleDeg)*CS.steeringAngleDeg/self.torque_params.angleFactor
+        output_torque += angle_compensation
 
       pid_log.active = True
       pid_log.p = self.pid.p

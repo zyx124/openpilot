@@ -181,7 +181,7 @@ class CarInterfaceBase(ABC):
     return ret
 
   @staticmethod
-  def configure_torque_tune(candidate, tune, steering_angle_deadzone_deg=0.0, use_steering_angle=True):
+  def configure_torque_tune(candidate, tune, steering_angle_deadzone_deg=0.0, use_steering_angle=True, linear_torque=True):
     params = get_torque_params(candidate)
 
     tune.init('torque')
@@ -193,6 +193,8 @@ class CarInterfaceBase(ABC):
     tune.torque.latAccelFactor = params['LAT_ACCEL_FACTOR']
     tune.torque.latAccelOffset = 0.0
     tune.torque.steeringAngleDeadzoneDeg = steering_angle_deadzone_deg
+    tune.torque.linearTorque = linear_torque
+    tune.torque.angleFactor = 180.0
 
   @abstractmethod
   def _update(self, c: car.CarControl) -> car.CarState:
