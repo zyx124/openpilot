@@ -78,6 +78,7 @@ class CarController:
 
     """ACC RADAR COMMAND"""                                                    
     if self.frame % 2 == 0:
+      printf("In carcontroller, calling create_radar_command")
       can_sends.extend(mazdacan.create_radar_command(self.packer, CS.CP.carFingerprint, self.frame, CC, CS))
     
     new_actuators = CC.actuators.copy()
