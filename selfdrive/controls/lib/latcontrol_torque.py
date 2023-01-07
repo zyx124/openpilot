@@ -74,6 +74,9 @@ class LatControlTorque(LatControl):
                                       feedforward=ff,
                                       speed=CS.vEgo,
                                       freeze_integrator=freeze_integrator)
+      table_x = [-1,-0.5,0,.5,1]
+      table_y = [-1,-.5,0,.5,1]
+      output_torque = interp(output_torque,table_x,table_y)
 
       pid_log.active = True
       pid_log.p = self.pid.p
