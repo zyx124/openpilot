@@ -69,7 +69,7 @@ unsigned int mazda_checksum(uint32_t address, const Signal &sig, const std::vect
     for (int i = 0; i < 7; i++) {
         sum += d[i];
     }
-    return ~sum;
+    return ~sum & 0xFF;
 }
 
 // Static lookup table for fast computation of CRCs
