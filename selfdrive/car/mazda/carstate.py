@@ -100,9 +100,7 @@ class CarState(CarStateBase):
     #       it should be used for carState.cruiseState.nonAdaptive instead
     if self.CP.openpilotLongitudinalControl:
       ret.cruiseState.available = cp_cam.vl["CRZ_CTRL"]["CRZ_AVAILABLE"] == 1
-      # Can't use CRZ_CTRL for enable since we are sending the enable signal to the radar
-      # It would be better to get the enabled signal from another message
-      ret.cruiseState.enabled = cp.vl["CRZ_EVENTS"]["CRUISE_ACTIVE_CAR_MOVING"] == 1
+      ret.cruiseState.enabled = cp_cam.vl["CRZ_CTRL"]["CRZ_ACTIVE"] == 1
     else:
       ret.cruiseState.available = cp.vl["CRZ_CTRL"]["CRZ_AVAILABLE"] == 1
       ret.cruiseState.enabled = cp.vl["CRZ_CTRL"]["CRZ_ACTIVE"] == 1
