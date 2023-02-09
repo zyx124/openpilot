@@ -192,26 +192,35 @@ void ignition_can_hook(CANPacket_t *to_push) {
   int addr = GET_ADDR(to_push);
   int len = GET_LEN(to_push);
 
-  ignition_can_cnt = 0U;  // reset counter
+  
 
   if (bus == 0) {
     // GM exception
     if ((addr == 0x160) && (len == 5)) {
       // this message isn't all zeros when ignition is on
       ignition_can = GET_BYTES_04(to_push) != 0U;
+      ignition_can_cnt = 0U;  // reset counter
     }
 
     // Tesla exception
     if ((addr == 0x348) && (len == 8)) {
       // GTW_status
       ignition_can = (GET_BYTE(to_push, 0) & 0x1U) != 0U;
+      ignition_can_cnt = 0U;  // reset counter
     }
 
     // Mazda exception
     if ((addr == 0x9E) && (len == 8)) {
       ignition_can = (GET_BYTE(to_push, 0) >> 5) == 0x6U;
+      ignition_can_cnt = 0U;  // reset counter
     }
 
+  } else if (bus == 2) {
+    // GEN2 Mazda exception
+    if((addr == 0x211) && (len == 8)) {
+      ignition_can = (GET_BYTE(to_push, 6) & 0x2U) == 0U;
+      ignition_can_cnt = 0U;
+    }
   }
 }
 
