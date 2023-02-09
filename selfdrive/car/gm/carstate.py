@@ -18,7 +18,8 @@ class CarState(CarStateBase):
     can_define = CANDefine(DBC[CP.carFingerprint]["pt"])
     self.shifter_values = can_define.dv["ECMPRDNL2"]["PRNDL2"]
     self.loopback_lka_steering_cmd_updated = False
-    self.camera_lka_steering_cmd_counter = 0
+    self.pt_lka_steering_cmd_counter = 0
+    self.cam_lka_steering_cmd_counter = 0
     self.buttons_counter = 0
 
   def update(self, pt_cp, cam_cp, loopback_cp):
@@ -33,7 +34,8 @@ class CarState(CarStateBase):
     # Variables used for avoiding LKAS faults
     self.loopback_lka_steering_cmd_updated = len(loopback_cp.vl_all["ASCMLKASteeringCmd"]["RollingCounter"]) > 0
     if self.CP.networkLocation == NetworkLocation.fwdCamera:
-      self.camera_lka_steering_cmd_counter = cam_cp.vl["ASCMLKASteeringCmd"]["RollingCounter"]
+      self.pt_lka_steering_cmd_counter = pt_cp.vl["ASCMLKASteeringCmd"]["RollingCounter"]
+      self.cam_lka_steering_cmd_counter = cam_cp.vl["ASCMLKASteeringCmd"]["RollingCounter"]
 
     ret.wheelSpeeds = self.get_wheel_speeds(
       pt_cp.vl["EBCMWheelSpdFront"]["FLWheelSpd"],
@@ -100,6 +102,9 @@ class CarState(CarStateBase):
     if self.CP.networkLocation == NetworkLocation.fwdCamera:
       ret.cruiseState.speed = cam_cp.vl["ASCMActiveCruiseControlStatus"]["ACCSpeedSetpoint"] * CV.KPH_TO_MS
       ret.stockAeb = cam_cp.vl["AEBCmd"]["AEBCmdActive"] != 0
+      # openpilot controls nonAdaptive when not pcmCruise
+      if self.CP.pcmCruise:
+        ret.cruiseState.nonAdaptive = cam_cp.vl["ASCMActiveCruiseControlStatus"]["ACCCruiseState"] not in (2, 3)
 
     return ret
 
@@ -112,6 +117,7 @@ class CarState(CarStateBase):
         ("AEBCmdActive", "AEBCmd"),
         ("RollingCounter", "ASCMLKASteeringCmd"),
         ("ACCSpeedSetpoint", "ASCMActiveCruiseControlStatus"),
+        ("ACCCruiseState", "ASCMActiveCruiseControlStatus"),
       ]
       checks += [
         ("AEBCmd", 10),
@@ -175,6 +181,15 @@ class CarState(CarStateBase):
       ("PSCMSteeringAngle", 100),
       ("ECMAcceleratorPos", 80),
     ]
+
+    # Used to read back last counter sent to PT by camera
+    if CP.networkLocation == NetworkLocation.fwdCamera:
+      signals += [
+        ("RollingCounter", "ASCMLKASteeringCmd"),
+      ]
+      checks += [
+        ("ASCMLKASteeringCmd", 0),
+      ]
 
     if CP.transmissionType == TransmissionType.direct:
       signals.append(("RegenPaddle", "EBCMRegenPaddle"))

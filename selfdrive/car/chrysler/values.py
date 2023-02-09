@@ -1,3 +1,4 @@
+from enum import IntFlag
 from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, List, Optional, Union
@@ -9,6 +10,10 @@ from selfdrive.car.docs_definitions import CarInfo, Harness
 from selfdrive.car.fw_query_definitions import FwQueryConfig, Request, p16
 
 Ecu = car.CarParams.Ecu
+
+
+class ChryslerFlags(IntFlag):
+  HIGHER_MIN_STEERING_SPEED = 1
 
 
 class CAR:
@@ -30,6 +35,7 @@ class CAR:
 
 class CarControllerParams:
   def __init__(self, CP):
+    self.STEER_STEP = 2  # 50 Hz
     self.STEER_ERROR_MAX = 80
     if CP.carFingerprint in RAM_HD:
       self.STEER_DELTA_UP = 14
@@ -40,8 +46,12 @@ class CarControllerParams:
       self.STEER_DELTA_DOWN = 6
       self.STEER_MAX = 261  # EPS allows more, up to 350?
     else:
-      self.STEER_DELTA_UP = 3
-      self.STEER_DELTA_DOWN = 3
+      if CP.carFingerprint in CHRYSLER_OLD_TUNING_BLACKLIST:
+        self.STEER_DELTA_UP = 3
+        self.STEER_DELTA_DOWN = 3
+      else:
+        self.STEER_DELTA_UP = 6
+        self.STEER_DELTA_DOWN = 6
       self.STEER_MAX = 261  # higher than this faults the EPS
 
 STEER_THRESHOLD = 120
@@ -49,6 +59,11 @@ STEER_THRESHOLD = 120
 RAM_DT = {CAR.RAM_1500, }
 RAM_HD = {CAR.RAM_HD, }
 RAM_CARS = RAM_DT | RAM_HD
+
+# the increased steer rate hasn't been verified on these cars.
+# remove from this list once it's been tested and confirmed to not fault
+CHRYSLER_OLD_TUNING_BLACKLIST = {CAR.PACIFICA_2017_HYBRID, CAR.PACIFICA_2018, CAR.PACIFICA_2018_HYBRID,
+                                 CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE}
 
 @dataclass
 class ChryslerCarInfo(CarInfo):
