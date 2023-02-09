@@ -17,7 +17,7 @@ class CarController:
     self.frame = 0
     self.params = CarControllerParams(CP)
     self.hold_timer = Timer(6.0)
-    self.hold_delay = Timer(.5) # delay before we start holding as to not hit the brakes too hard
+    self.hold_delay = Timer(0.5) # delay before we start holding as to not hit the brakes too hard
     self.resume_timer = Timer(0.5)
 
   def update(self, CC, CS):
