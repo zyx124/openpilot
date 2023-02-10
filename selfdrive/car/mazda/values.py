@@ -4,8 +4,8 @@ Ecu = car.CarParams.Ecu
 
 
 # Steer torque limits
-
-def __init__(self, CP):
+class CarControllerParams:
+  def __init__(self, CP):
     self.STEER_STEP = 1 # 100 Hz
     if CP.carFingerprint in GEN1:
       self.STEER_MAX = 800                # theoretical max_steer 2047
