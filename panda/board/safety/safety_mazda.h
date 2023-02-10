@@ -200,17 +200,17 @@ const safety_hooks mazda_hooks = {
 #define MAZDA_2019_CRZ_BTNS       0x9d  // rx on main tx on camera. DBC: CRZ_BTNS
 #define MAZDA_2019_ACC            0x220 // main bus. DBC: ACC
 
-#define MAZDA_MAX_STEER 8000U
+#define MAZDA_2019_MAX_STEER 8000U
 
 // max delta torque allowed for real time checks
-#define MAZDA_MAX_RT_DELTA 844
+#define MAZDA_2019_MAX_RT_DELTA 844
 // 250ms between real time checks
-#define MAZDA_RT_INTERVAL 250000
-#define MAZDA_MAX_RATE_UP 45
-#define MAZDA_MAX_RATE_DOWN 80
-#define MAZDA_DRIVER_TORQUE_ALLOWANCE 1400
-#define MAZDA_DRIVER_TORQUE_FACTOR 1
-#define MAZDA_MAX_TORQUE_ERROR 3500
+#define MAZDA_2019_RT_INTERVAL 250000
+#define MAZDA_2019_MAX_RATE_UP 45
+#define MAZDA_2019_MAX_RATE_DOWN 80
+#define MAZDA_2019_DRIVER_TORQUE_ALLOWANCE 1400
+#define MAZDA_2019_DRIVER_TORQUE_FACTOR 1
+#define MAZDA_2019_MAX_TORQUE_ERROR 3500
 
 const CanMsg MAZDA_2019_TX_MSGS[] = {{MAZDA_2019_LKAS, 1, 8}, {MAZDA_2019_ACC, 2, 8}};
 
@@ -248,7 +248,7 @@ static int mazda_2019_rx_hook(CANPacket_t *to_push) {
           default: // default address main
             break;
         }
-        generic_rx_checks(addr = MAZDA_2019_GAS); 
+        generic_rx_checks((addr == MAZDA_2019_GAS)); 
         break; // end MAZDA_MAIN
 
       case MAZDA_CAM:
@@ -368,7 +368,7 @@ static int mazda_2019_fwd_hook(int bus, CANPacket_t *to_fwd) {
   return bus_fwd;
 }
 
-static const addr_checks* mazda_init(int16_t param) {
+static const addr_checks* mazda_2019_init(int16_t param) {
   UNUSED(param);
   controls_allowed = false;
   relay_malfunction_reset();
