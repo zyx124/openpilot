@@ -58,8 +58,8 @@ class CarState(CarStateBase):
     ret.doorOpen = False # Cruise will not engage if door is open (handled by car)
     ret.brakePressed = cp.vl["BRAKE_PEDAL"]["BRAKE_PEDAL_PRESSED"] == 1
     ret.brake = .1
-    ret.steerFaultPermanent = False # TODO locate signal. Car shows light on dash if there is a fault
-    ret.steerFaultTemporary = False # TODO locate signal. Car shows light on dash if there is a fault
+    
+    
     ret.cruiseState.available = True # TODO locate signal.
     ret.cruiseState.speed = cp.vl["CRUZE_STATE"]["CRZ_SPEED"] * unit_conversion 
     ret.cruiseState.enabled = ( (cp.vl["CRUZE_STATE"]["CRZ_ENABLED"] == 1) or (cp.vl["CRUZE_STATE"]["PRE_ENABLE"] == 1) )
