@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from cereal import car
 from selfdrive.config import Conversions as CV
-from selfdrive.car.mazda.values import CAR, LKAS_LIMITS
+from selfdrive.car.mazda.values import CAR, LKAS_LIMITS, GEN1, GEN2
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness, gen_empty_fingerprint, get_safety_config
 from selfdrive.car.interfaces import CarInterfaceBase
 
@@ -19,10 +19,20 @@ class CarInterface(CarInterfaceBase):
     ret = CarInterfaceBase.get_std_params(candidate, fingerprint)
 
     ret.carName = "mazda"
-    ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda)]
+    if candidate in GEN1:
+      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda)]
+      
+    if candidate in GEN2:
+      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda2019)]
+      ret.openpilotLongitudinalControl = True
+      ret.stopAccel = 0.0
+      ret.longitudinalTuning.kpBP = [0., 5., 35.]
+      ret.longitudinalTuning.kpV = [0.0, 0.0, 0.0]
+      ret.longitudinalTuning.kiBP = [0., 35.]
+      ret.longitudinalTuning.kiV = [0.0, 0.0]
     ret.radarOffCan = True
 
-    ret.dashcamOnly = candidate not in (CAR.CX5_2022, CAR.CX9_2021)
+    ret.dashcamOnly = candidate not in (CAR.CX5_2022, CAR.CX9_2021, CAR.MAZDA3_2019, CAR.CX_30, CAR.CX_50, CAR.CX_60, CAR.CX_70, CAR.CX_80, CAR.CX_90)
 
     ret.steerActuatorDelay = 0.1
     ret.steerRateCost = 1.0
@@ -57,8 +67,29 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.19], [0.019]]
       ret.lateralTuning.pid.kf = 0.00006
-
-    if candidate not in (CAR.CX5_2022, ):
+    elif candidate in CAR.MAZDA3_2019:
+      ret.mass = 3000 * CV.LB_TO_KG + STD_CARGO_KG
+      ret.wheelbase = 2.725
+      ret.steerRatio = 17.0
+      ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.19], [0.019]]
+      ret.lateralTuning.pid.kf = 0.00006
+    elif candidate in (CAR.CX_30, CAR.CX_50):
+      ret.mass = 3375 * CV.LB_TO_KG + STD_CARGO_KG
+      ret.wheelbase = 2.7
+      ret.steerRatio = 15.5
+      ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.19], [0.019]]
+      ret.lateralTuning.pid.kf = 0.00006
+    elif candidate in (CAR.CX_60, CAR.CX_80, CAR.CX_70, CAR.CX_90):
+      ret.mass = 4217 * CV.LB_TO_KG + STD_CARGO_KG
+      ret.wheelbase = 3.1
+      ret.steerRatio = 17.6
+      ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.19], [0.019]]
+      ret.lateralTuning.pid.kf = 0.00006
+      
+    if candidate not in (CAR.CX5_2022, CAR.MAZDA3_2019, CAR.CX_30, CAR.CX_50, CAR.CX_60, CAR.CX_70, CAR.CX_80, CAR.CX_90):
       ret.minSteerSpeed = LKAS_LIMITS.DISABLE_SPEED * CV.KPH_TO_MS
 
     ret.centerToFront = ret.wheelbase * 0.41
@@ -79,8 +110,9 @@ class CarInterface(CarInterfaceBase):
 
     self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
+    self.cp_body.update_strings(can_strings)
 
-    ret = self.CS.update(self.cp, self.cp_cam)
+    ret = self.CS.update(self.cp, self.cp_cam, self.cp_body)
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
 
     # events
