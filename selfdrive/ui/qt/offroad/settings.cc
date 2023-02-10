@@ -36,6 +36,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_openpilot.png",
     },
     {
+    "OpenpilotLongitudinalControl",
+      "Override Stock ACC",
+      "Use openpilot's longitudinal control instead of the car's built-in ACC. Enabling this will disable Automatic Emergency Braking (AEB).",
+      "../assets/offroad/icon_openpilot.png",
+    },
+    {
       "IsLdwEnabled",
       "Enable Lane Departure Warnings",
       "Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn signal activated while driving over 31 mph (50 km/h).",
