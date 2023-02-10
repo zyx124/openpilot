@@ -69,6 +69,21 @@ unsigned int chrysler_checksum(unsigned int address, uint64_t d, int l) {
   return ~checksum & 0xFF;
 }
 
+unsigned int mazda_checksum(unsigned int address, uint64_t d, int l) {
+  uint8_t checksum = 0;
+  if (address == 0x220U) {
+    checksum = 0x2aU;
+  }
+  if (address == 0x249U){
+    checksum = 0x53U;
+  }
+  for (int i = 0; i < 7; i++) {
+      checksum += (d >> (i * 8)) & 0xFF; // add all bytes except checksum
+  }
+
+  return checksum;
+}
+
 // Static lookup table for fast computation of CRC8 poly 0x2F, aka 8H2F/AUTOSAR
 uint8_t crc8_lut_8h2f[256];
 
