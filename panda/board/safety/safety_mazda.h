@@ -305,22 +305,22 @@ static int mazda_2019_tx_hook(CANPacket_t *to_send) {
       if (controls_allowed) {
 
         // *** global torque limit check ***
-        violation |= max_limit_check(desired_torque, MAZDA_MAX_STEER, -MAZDA_MAX_STEER);
+        violation |= max_limit_check(desired_torque, MAZDA_2019_MAX_STEER, -MAZDA_2019_MAX_STEER);
 
         // *** torque rate limit check ***
         violation |= driver_limit_check(desired_torque, desired_torque_last, &torque_driver,
-                                        MAZDA_MAX_STEER, MAZDA_MAX_RATE_UP, MAZDA_MAX_RATE_DOWN,
-                                        MAZDA_DRIVER_TORQUE_ALLOWANCE, MAZDA_DRIVER_TORQUE_FACTOR);
+                                        MAZDA_2019_MAX_STEER, MAZDA_2019_MAX_RATE_UP, MAZDA_2019_MAX_RATE_DOWN,
+                                        MAZDA_2019_DRIVER_TORQUE_ALLOWANCE, MAZDA_2019_DRIVER_TORQUE_FACTOR);
 
         // used next time
         desired_torque_last = desired_torque;
 
         // *** torque real time rate limit check ***
-        violation |= rt_rate_limit_check(desired_torque, rt_torque_last, MAZDA_MAX_RT_DELTA);
+        violation |= rt_rate_limit_check(desired_torque, rt_torque_last, MAZDA_2019_MAX_RT_DELTA);
 
         // every RT_INTERVAL set the new limits
         uint32_t ts_elapsed = get_ts_elapsed(ts, ts_last);
-        if (ts_elapsed > ((uint32_t) MAZDA_RT_INTERVAL)) {
+        if (ts_elapsed > ((uint32_t) MAZDA_2019_RT_INTERVAL)) {
           rt_torque_last = desired_torque;
           ts_last = ts;
         }
@@ -339,7 +339,7 @@ static int mazda_2019_tx_hook(CANPacket_t *to_send) {
       }
 
       if (violation) {
-        tx = 0;
+        //tx = 0;
       }
     }
   }

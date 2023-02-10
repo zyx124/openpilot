@@ -78,10 +78,10 @@ unsigned int mazda_checksum(unsigned int address, uint64_t d, int l) {
     checksum = 0x53U;
   }
   for (int i = 0; i < 7; i++) {
-      checksum += (d >> (i * 8)) & 0xFF; // add all bytes except checksum
+      checksum += (d >> (56-(i * 8))) & 0xFF; // add all bytes except checksum
   }
 
-  return checksum;
+  return checksum ;
 }
 
 // Static lookup table for fast computation of CRC8 poly 0x2F, aka 8H2F/AUTOSAR

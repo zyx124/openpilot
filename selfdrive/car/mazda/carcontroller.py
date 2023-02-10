@@ -3,6 +3,7 @@ from opendbc.can.packer import CANPacker
 from selfdrive.car.mazda import mazdacan
 from selfdrive.car.mazda.values import CarControllerParams, Buttons, GEN1
 from selfdrive.car import apply_std_steer_torque_limits
+from common.realtime import ControlsTimer as Timer
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
@@ -13,6 +14,9 @@ class CarController():
     self.steer_rate_limited = False
     self.brake_counter = 0
     self.params = CarControllerParams(CP)
+    self.hold_timer = Timer(6.0)
+    self.hold_delay = Timer(0.5) # delay before we start holding as to not hit the brakes too hard
+    self.resume_timer = Timer(0.5)
 
   def update(self, c, CS, frame):
     can_sends = []
@@ -59,6 +63,31 @@ class CarController():
         # TODO: find a way to silence audible warnings so we can add more hud alerts
         steer_required = steer_required and CS.lkas_allowed_speed
         can_sends.append(mazdacan.create_alert_command(self.packer, CS.cam_laneinfo, ldw, steer_required))
+    
+    else: # gen2
+      resume = False
+      hold = False
+      if Timer.interval(2): # send ACC command at 50hz 
+        """
+        Without this hold/resum logic, the car will only stop momentarily.
+        It will then start creeping forward again. This logic allows the car to
+        apply the electric brake to hold the car. The hold delay also fixes a
+        bug with the stock ACC where it sometimes will apply the brakes too early 
+        when coming to a stop. 
+        """
+        if CS.out.standstill: # if we're stopped
+          if not self.hold_delay.active(): # and we have been stopped for more than hold_delay duration. This prevents a hard brake if we aren't fully stopped.
+            if (c.cruiseControl.resume or c.cruiseControl.override): # and we want to resume
+              self.resume_timer.reset() # reset the resume timer so its active
+            else: # otherwise we're holding
+              hold = self.hold_timer.active() # hold for 6s. This allows the electric brake to hold the car.
+              
+        else: # if we're moving
+          self.hold_timer.reset() # reset the hold timer so its active when we stop
+          self.hold_delay.reset() # reset the hold delay
+          
+        resume = self.resume_timer.active() # stay on for 0.5s to release the brake. This allows the car to move.
+        can_sends.append(mazdacan.create_acc_cmd(self, self.packer, CS, c, hold, resume))
 
     # send steering command
     can_sends.append(mazdacan.create_steering_control(self.packer, CS.CP.carFingerprint,
