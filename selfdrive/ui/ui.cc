@@ -115,6 +115,9 @@ void update_model(UIState *s, const cereal::ModelDataV2::Reader &model) {
 void update_dmonitoring(UIState *s, const cereal::DriverStateV2::Reader &driverstate, float dm_fade_state, bool is_rhd) {
   UIScene &scene = s->scene;
   const auto driver_orient = is_rhd ? driverstate.getRightDriverData().getFaceOrientation() : driverstate.getLeftDriverData().getFaceOrientation();
+  if (driver_orient.size() != std::size(scene.driver_pose_vals)) {
+    return;
+  }
   for (int i = 0; i < std::size(scene.driver_pose_vals); i++) {
     float v_this = (i == 0 ? (driver_orient[i] < 0 ? 0.7 : 0.9) : 0.4) * driver_orient[i];
     scene.driver_pose_diff[i] = fabs(scene.driver_pose_vals[i] - v_this);
@@ -199,7 +202,12 @@ static void update_state(UIState *s) {
     float scale = (sm["wideRoadCameraState"].getWideRoadCameraState().getSensor() == cereal::FrameData::ImageSensor::AR0231) ? 6.0f : 1.0f;
     scene.light_sensor = std::max(100.0f - scale * sm["wideRoadCameraState"].getWideRoadCameraState().getExposureValPercent(), 0.0f);
   }
-  scene.started = sm["deviceState"].getDeviceState().getStarted() && scene.ignition;
+  // check if sm has started 
+  if (sm.updated("deviceState")) {
+    scene.started = sm["deviceState"].getDeviceState().getStarted() && scene.ignition;
+  }
+  //scene.started = sm["deviceState"].getDeviceState().getStarted() && scene.ignition;
+  //scene.started = true;
 }
 
 void ui_update_params(UIState *s) {

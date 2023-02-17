@@ -30,6 +30,9 @@ Sound::Sound(QObject *parent) : sm({"controlsState", "deviceState", "microphone"
 };
 
 void Sound::update() {
+  if (!sm.alive("deviceState")) {
+    return;
+  }
   const bool started_prev = sm["deviceState"].getDeviceState().getStarted();
   sm.update(0);
 

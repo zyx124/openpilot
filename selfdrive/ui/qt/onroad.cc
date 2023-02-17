@@ -238,44 +238,54 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
   const int SET_SPEED_NA = 255;
   const SubMaster &sm = *(s.sm);
 
-  const bool cs_alive = sm.alive("controlsState");
-  const bool nav_alive = sm.alive("navInstruction") && sm["navInstruction"].getValid();
+  bool cs_alive = sm.alive("controlsState"); // alive
+  bool cs_updated = sm.updated("controlsState");
+  bool nav_alive = sm.alive("navInstruction") && sm["navInstruction"].getValid();
+  bool nav_updated = sm.updated("navInstruction");
+  bool car_state_updated = sm.updated("carState");
+  
+  static float v_cruise = 0.0;
 
-  const auto cs = sm["controlsState"].getControlsState();
-
-  // Handle older routes where vCruiseCluster is not set
-  float v_cruise =  cs.getVCruiseCluster() == 0.0 ? cs.getVCruise() : cs.getVCruiseCluster();
+  if (cs_updated) {
+    v_cruise =  sm["controlsState"].getControlsState().getVCruiseCluster() == 0.0 ? sm["controlsState"].getControlsState().getVCruise() : sm["controlsState"].getControlsState().getVCruiseCluster();
+  }
   float set_speed = cs_alive ? v_cruise : SET_SPEED_NA;
   bool cruise_set = set_speed > 0 && (int)set_speed != SET_SPEED_NA;
   if (cruise_set && !s.scene.is_metric) {
     set_speed *= KM_TO_MILE;
   }
-
   // Handle older routes where vEgoCluster is not set
   float v_ego;
-  if (sm["carState"].getCarState().getVEgoCluster() == 0.0 && !v_ego_cluster_seen) {
-    v_ego = sm["carState"].getCarState().getVEgo();
-  } else {
-    v_ego = sm["carState"].getCarState().getVEgoCluster();
-    v_ego_cluster_seen = true;
+  if (car_state_updated) {
+    if (sm["carState"].getCarState().getVEgoCluster() == 0.0 && !v_ego_cluster_seen) {
+      v_ego = sm["carState"].getCarState().getVEgo();
+    } else {
+      v_ego = sm["carState"].getCarState().getVEgoCluster();
+      v_ego_cluster_seen = true;
+    }
   }
+  
   float cur_speed = cs_alive ? std::max<float>(0.0, v_ego) : 0.0;
   cur_speed *= s.scene.is_metric ? MS_TO_KPH : MS_TO_MPH;
-
-  auto speed_limit_sign = sm["navInstruction"].getNavInstruction().getSpeedLimitSign();
-  float speed_limit = nav_alive ? sm["navInstruction"].getNavInstruction().getSpeedLimit() : 0.0;
-  speed_limit *= (s.scene.is_metric ? MS_TO_KPH : MS_TO_MPH);
-
-  setProperty("speedLimit", speed_limit);
-  setProperty("has_us_speed_limit", nav_alive && speed_limit_sign == cereal::NavInstruction::SpeedLimitSign::MUTCD);
-  setProperty("has_eu_speed_limit", nav_alive && speed_limit_sign == cereal::NavInstruction::SpeedLimitSign::VIENNA);
-
-  setProperty("is_cruise_set", cruise_set);
+  if (nav_updated) {
+    auto speed_limit_sign = sm["navInstruction"].getNavInstruction().getSpeedLimitSign();
+    float speed_limit = nav_alive ? sm["navInstruction"].getNavInstruction().getSpeedLimit() : 0.0;
+    
+    setProperty("speedLimit", speed_limit);
+    setProperty("has_us_speed_limit", nav_alive && speed_limit_sign == cereal::NavInstruction::SpeedLimitSign::MUTCD);
+    setProperty("has_eu_speed_limit", nav_alive && speed_limit_sign == cereal::NavInstruction::SpeedLimitSign::VIENNA);
+  }
+  
+  
+  
   setProperty("is_metric", s.scene.is_metric);
   setProperty("speed", cur_speed);
-  setProperty("setSpeed", set_speed);
   setProperty("speedUnit", s.scene.is_metric ? tr("km/h") : tr("mph"));
-  setProperty("hideDM", (cs.getAlertSize() != cereal::ControlsState::AlertSize::NONE));
+  if (cs_alive){
+    setProperty("setSpeed", set_speed);
+    setProperty("hideDM", (sm["controlsState"].getControlsState().getAlertSize() != cereal::ControlsState::AlertSize::NONE));
+    setProperty("is_cruise_set", cruise_set);
+  }
   setProperty("status", s.status);
 
   // update engageability/experimental mode button
@@ -283,10 +293,11 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
 
   // update DM icons at 2Hz
   if (sm.frame % (UI_FREQ / 2) == 0) {
+    if (sm.updated("driverMonitoringState")) {
     setProperty("dmActive", sm["driverMonitoringState"].getDriverMonitoringState().getIsActiveMode());
     setProperty("rightHandDM", sm["driverMonitoringState"].getDriverMonitoringState().getIsRHD());
+    }
   }
-
   // DM icon transition
   dm_fade_state = fmax(0.0, fmin(1.0, dm_fade_state+0.2*(0.5-(float)(dmActive))));
 }
@@ -625,7 +636,6 @@ void AnnotatedCameraWidget::paintGL() {
   SubMaster &sm = *(s->sm);
   const double start_draw_t = millis_since_boot();
   const cereal::ModelDataV2::Reader &model = sm["modelV2"].getModelV2();
-  const cereal::RadarState::Reader &radar_state = sm["radarState"].getRadarState();
 
   // draw camera frame
   {
@@ -671,25 +681,27 @@ void AnnotatedCameraWidget::paintGL() {
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
   painter.setPen(Qt::NoPen);
-
-  if (s->worldObjectsVisible()) {
-    if (sm.rcv_frame("modelV2") > s->scene.started_frame) {
-      update_model(s, sm["modelV2"].getModelV2());
-      if (sm.rcv_frame("radarState") > s->scene.started_frame) {
-        update_leads(s, radar_state, sm["modelV2"].getModelV2().getPosition());
+  if (sm.updated("radarState")) {
+    const cereal::RadarState::Reader &radar_state = sm["radarState"].getRadarState();
+    if (s->worldObjectsVisible()) {
+      if (sm.rcv_frame("modelV2") > s->scene.started_frame) {
+        update_model(s, sm["modelV2"].getModelV2());
+        if (sm.rcv_frame("radarState") > s->scene.started_frame) {
+          update_leads(s, radar_state, sm["modelV2"].getModelV2().getPosition());
+        }
       }
-    }
 
-    drawLaneLines(painter, s);
+      drawLaneLines(painter, s);
 
-    if (s->scene.longitudinal_control) {
-      auto lead_one = radar_state.getLeadOne();
-      auto lead_two = radar_state.getLeadTwo();
-      if (lead_one.getStatus()) {
-        drawLead(painter, lead_one, s->scene.lead_vertices[0]);
-      }
-      if (lead_two.getStatus() && (std::abs(lead_one.getDRel() - lead_two.getDRel()) > 3.0)) {
-        drawLead(painter, lead_two, s->scene.lead_vertices[1]);
+      if (s->scene.longitudinal_control) {
+        auto lead_one = radar_state.getLeadOne();
+        auto lead_two = radar_state.getLeadTwo();
+        if (lead_one.getStatus()) {
+          drawLead(painter, lead_one, s->scene.lead_vertices[0]);
+        }
+        if (lead_two.getStatus() && (std::abs(lead_one.getDRel() - lead_two.getDRel()) > 3.0)) {
+          drawLead(painter, lead_two, s->scene.lead_vertices[1]);
+        }
       }
     }
   }

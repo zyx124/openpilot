@@ -117,13 +117,13 @@ def ui_thread(addr):
       continue
 
     imgff = np.frombuffer(yuv_img_raw, dtype=np.uint8).reshape((vipc_client.height * 3 // 2, vipc_client.width))
-    num_px = vipc_client.width * vipc_client.height
+    #num_px = vipc_client.width * vipc_client.height
     bgr = cv2.cvtColor(imgff, cv2.COLOR_YUV2RGB_NV12)
 
-    zoom_matrix = _BB_TO_FULL_FRAME[num_px]
-    cv2.warpAffine(bgr, zoom_matrix[:2], (img.shape[1], img.shape[0]), dst=img, flags=cv2.WARP_INVERSE_MAP)
+    #zoom_matrix = _BB_TO_FULL_FRAME[num_px]
+    #cv2.warpAffine(bgr, zoom_matrix[:2], (img.shape[1], img.shape[0]), dst=img, flags=cv2.WARP_INVERSE_MAP)
 
-    intrinsic_matrix = _INTRINSICS[num_px]
+    #intrinsic_matrix = _INTRINSICS[num_px]
 
     sm.update(0)
 

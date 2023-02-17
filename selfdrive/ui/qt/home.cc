@@ -52,9 +52,11 @@ void HomeWindow::updateState(const UIState &s) {
   const SubMaster &sm = *(s.sm);
 
   // switch to the generic robot UI
-  if (onroad->isVisible() && !body->isEnabled() && sm["carParams"].getCarParams().getNotCar()) {
-    body->setEnabled(true);
-    slayout->setCurrentWidget(body);
+  if (sm.updated("carParams")) {
+    if (onroad->isVisible() && !body->isEnabled() && sm["carParams"].getCarParams().getNotCar()) {
+      body->setEnabled(true);
+      slayout->setCurrentWidget(body);
+    }
   }
 }
 
@@ -88,13 +90,15 @@ void HomeWindow::mousePressEvent(QMouseEvent* e) {
 void HomeWindow::mouseDoubleClickEvent(QMouseEvent* e) {
   HomeWindow::mousePressEvent(e);
   const SubMaster &sm = *(uiState()->sm);
-  if (sm["carParams"].getCarParams().getNotCar()) {
-    if (onroad->isVisible()) {
-      slayout->setCurrentWidget(body);
-    } else if (body->isVisible()) {
-      slayout->setCurrentWidget(onroad);
+  if (sm.updated("carParams")) {
+    if (sm["carParams"].getCarParams().getNotCar()) {
+      if (onroad->isVisible()) {
+        slayout->setCurrentWidget(body);
+      } else if (body->isVisible()) {
+        slayout->setCurrentWidget(onroad);
+      }
+      showSidebar(false);
     }
-    showSidebar(false);
   }
 }
 

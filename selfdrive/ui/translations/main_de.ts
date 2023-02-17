@@ -293,6 +293,21 @@
     </message>
 </context>
 <context>
+    <name>HomeWindow</name>
+    <message>
+        <source>UPDATE</source>
+        <translation type="obsolete">Aktualisieren</translation>
+    </message>
+    <message>
+        <source> ALERTS</source>
+        <translation type="obsolete"> HINWEISE</translation>
+    </message>
+    <message>
+        <source> ALERT</source>
+        <translation type="obsolete"> HINWEIS</translation>
+    </message>
+</context>
+<context>
     <name>InputDialog</name>
     <message>
         <source>Cancel</source>

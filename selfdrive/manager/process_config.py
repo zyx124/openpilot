@@ -63,7 +63,9 @@ procs = [
   PythonProcess("updated", "selfdrive.updated", enabled=not PC, onroad=False, offroad=True),
   PythonProcess("uploader", "selfdrive.loggerd.uploader", offroad=True),
   PythonProcess("statsd", "selfdrive.statsd", offroad=True),
-
+  PythonProcess("metadrive", "tools.streamer.gamerunner",enabled=PC, offroad=True),
+  PythonProcess("streamer", "tools.streamer.streamer",enabled=PC, offroad=True),
+  
   # debug procs
   NativeProcess("bridge", "cereal/messaging", ["./bridge"], onroad=False, callback=notcar),
   PythonProcess("webjoystick", "tools.joystick.web", onroad=False, callback=notcar),

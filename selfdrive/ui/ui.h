@@ -47,11 +47,15 @@ struct Alert {
   }
 
   static Alert get(const SubMaster &sm, uint64_t started_frame) {
-    const cereal::ControlsState::Reader &cs = sm["controlsState"].getControlsState();
+    
+    //const cereal::ControlsState::Reader &cs = sm["controlsState"].getControlsState();
+
+    
     if (sm.updated("controlsState")) {
-      return {cs.getAlertText1().cStr(), cs.getAlertText2().cStr(),
-              cs.getAlertType().cStr(), cs.getAlertSize(),
-              cs.getAlertSound()};
+      
+      return {sm["controlsState"].getControlsState().getAlertText1().cStr(), sm["controlsState"].getControlsState().getAlertText2().cStr(),
+              sm["controlsState"].getControlsState().getAlertType().cStr(), sm["controlsState"].getControlsState().getAlertSize(),
+              sm["controlsState"].getControlsState().getAlertSound()};
     } else if ((sm.frame - started_frame) > 5 * UI_FREQ) {
       const int CONTROLS_TIMEOUT = 5;
       const int controls_missing = (nanos_since_boot() - sm.rcv_time("controlsState")) / 1e9;
@@ -64,7 +68,7 @@ struct Alert {
                 AudibleAlert::NONE};
       } else if (controls_missing > CONTROLS_TIMEOUT && !Hardware::PC()) {
         // car is started, but controls is lagging or died
-        if (cs.getEnabled() && (controls_missing - CONTROLS_TIMEOUT) < 10) {
+        if (sm["controlsState"].getControlsState().getEnabled() && (controls_missing - CONTROLS_TIMEOUT) < 10) {
           return {"TAKE CONTROL IMMEDIATELY", "Controls Unresponsive",
                   "controlsUnresponsive", cereal::ControlsState::AlertSize::FULL,
                   AudibleAlert::WARNING_IMMEDIATE};
@@ -135,7 +139,11 @@ public:
     return sm->rcv_frame("liveCalibration") > scene.started_frame;
   };
   inline bool engaged() const {
-    return scene.started && (*sm)["controlsState"].getControlsState().getEnabled();
+    bool en = false;
+    if ((*sm).updated("controlsState")) {
+      en = scene.started && (*sm)["controlsState"].getControlsState().getEnabled();
+    }
+    return en;
   };
 
   int fb_w = 0, fb_h = 0;
