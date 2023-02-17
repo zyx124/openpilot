@@ -6,6 +6,8 @@ from selfdrive.car import apply_std_steer_torque_limits
 from common.realtime import ControlsTimer as Timer
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
+LongCtrlState = car.CarControl.Actuators.LongControlState
+
 
 class CarController():
   def __init__(self, dbc_name, CP, VM):
