@@ -92,7 +92,7 @@ class CarController():
     # send steering command
     can_sends.append(mazdacan.create_steering_control(self.packer, CS.CP.carFingerprint,
                                                       frame, apply_steer, CS.cam_lkas))
-
+    Timer.tick()
     new_actuators = c.actuators.copy()
     new_actuators.steer = apply_steer / self.params.STEER_MAX
 
