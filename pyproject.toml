@@ -173,6 +173,9 @@ Werkzeug = "^2.1.2"
 zerorpc = { git = "https://github.com/commaai/zerorpc-python.git", branch = "master" }
 omegaconf = "^2.3.0"
 osmnx = "==1.2.2"
+panda3d = ">1.10.8, <=1.10.13"
+gym = ">=0.20.0, <=0.24.0"
+metadrive-simulator = { git = "https://github.com/jon-chuang/metadrive.git", branch = "jon/versioning-hack" }
 
 
 [build-system]
