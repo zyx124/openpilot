@@ -6,7 +6,12 @@ import numpy as np
 
 os.environ["OMP_NUM_THREADS"] = "4"
 os.environ["OMP_WAIT_POLICY"] = "PASSIVE"
-import torch
+METADRIVE = "METADRIVE" in os.environ
+if METADRIVE:
+  try:
+    import torch # noqa: F401 pylint: disable=W0611
+  except ImportError:
+    print("torch not installed", file=sys.stderr)
 import onnxruntime as ort # pylint: disable=import-error
 
 ORT_TYPES_TO_NP_TYPES = {'tensor(float16)': np.float16, 'tensor(float)': np.float32, 'tensor(uint8)': np.uint8}

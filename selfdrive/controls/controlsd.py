@@ -36,6 +36,7 @@ LANE_DEPARTURE_THRESHOLD = 0.1
 
 REPLAY = "REPLAY" in os.environ
 SIMULATION = "SIMULATION" in os.environ
+METADRIVE = "METADRIVE" in os.environ
 NOSENSOR = "NOSENSOR" in os.environ
 IGNORE_PROCESSES = {"uploader", "deleter", "loggerd", "logmessaged", "tombstoned", "statsd",
                     "logcatd", "proclogd", "clocksd", "updated", "timezoned", "manage_athenad"} | \
@@ -86,6 +87,8 @@ class Controls:
       ignore = ['testJoystick']
       if SIMULATION:
         ignore += ['driverCameraState', 'managerState']
+        if METADRIVE:
+          ignore += ['liveLocationKalman', 'liveParameters', 'liveTorqueParameters']
       if self.params.get_bool('WideCameraOnly'):
         ignore += ['roadCameraState']
       self.sm = messaging.SubMaster(['deviceState', 'pandaStates', 'peripheralState', 'modelV2', 'liveCalibration',
@@ -339,7 +342,10 @@ class Controls:
         elif not self.sm.all_freq_ok(self.camera_packets):
           self.events.add(EventName.cameraFrameRate)
     if self.rk.lagging:
-      self.events.add(EventName.controlsdLagging)
+      if not METADRIVE:
+        self.events.add(EventName.controlsdLagging)
+      else:
+        print("METADRIVE: controlsdLagging")
     if len(self.sm['radarState'].radarErrors) or not self.sm.all_checks(['radarState']):
       self.events.add(EventName.radarFault)
     if not self.sm.valid['pandaStates']:
