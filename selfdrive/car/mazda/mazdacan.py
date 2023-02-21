@@ -119,14 +119,11 @@ def create_acc_cmd(self, packer, CS, CC, hold, resume):
     values = CS.acc
     msg_name = "ACC"
     bus = 2
-
-    if (values["ACC_ENABLED"]):
-      if Params().get_bool("OpenpilotLongitudinalControl"):
+    if Params().get_bool("OpenpilotLongitudinalControl"):
+      if (values["ACC_ENABLED"]):
         values["ACCEL_CMD"] = (CC.actuators.accel * 240) + 2000
-      values["HOLD"] = hold
-      values["RESUME"] = resume
-    else:
-      pass
+        values["HOLD"] = hold
+        values["RESUME"] = resume
 
   return packer.make_can_msg(msg_name, bus, values)
 
