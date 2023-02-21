@@ -42,6 +42,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_openpilot.png",
     },
     {
+      "NudgelessLaneChange",
+      "Nudgeless Lane Change",
+      "Don't require the driver to turn the steering wheel when changing lanes.",
+      "../assets/offroad/icon_openpilot.png",
+    }
+    {
       "IsLdwEnabled",
       "Enable Lane Departure Warnings",
       "Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn signal activated while driving over 31 mph (50 km/h).",

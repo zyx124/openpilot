@@ -1,5 +1,6 @@
 Version 0.8.13 (2022-02-18)
 ========================
+ * Don't disable on gas press!
  * Longitudinal control disabled by default
   * Longitudinal control doesn't auto resume properly on Mazda. Working on a fix.
 

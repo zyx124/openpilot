@@ -254,7 +254,7 @@ static int mazda_2019_rx_hook(CANPacket_t *to_push) {
       case MAZDA_CAM:
         switch (addr) {
           case MAZDA_2019_GAS:
-            gas_pressed = (GET_BYTE(to_push, 4) || (GET_BYTE(to_push, 5) & 0xC0U));
+            gas_pressed = false;// (GET_BYTE(to_push, 4) || (GET_BYTE(to_push, 5) & 0xC0U));
             break; // end MAZDA_2019_GAS
 
           case MAZDA_2019_SPEED:

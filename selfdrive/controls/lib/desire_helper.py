@@ -1,6 +1,7 @@
 from cereal import log
 from common.realtime import DT_MDL
 from selfdrive.config import Conversions as CV
+from common.params import Params
 
 LaneChangeState = log.LateralPlan.LaneChangeState
 LaneChangeDirection = log.LateralPlan.LaneChangeDirection
@@ -69,7 +70,7 @@ class DesireHelper:
 
         if not one_blinker or below_lane_change_speed:
           self.lane_change_state = LaneChangeState.off
-        elif torque_applied and not blindspot_detected:
+        elif (torque_applied or Params().get_bool("NudgelessLaneChange")) and not blindspot_detected:
           self.lane_change_state = LaneChangeState.laneChangeStarting
 
       # LaneChangeState.laneChangeStarting
