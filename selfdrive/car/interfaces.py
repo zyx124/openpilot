@@ -1,8 +1,8 @@
 import os
 import time
 from abc import abstractmethod, ABC
-from typing import Dict, Tuple, List
-
+from typing import Any, Dict, Optional, Tuple, List, Callable
+from common.numpy_fast import interp
 from cereal import car
 from common.kalman.simple_kalman import KF1D
 from common.realtime import DT_CTRL
@@ -14,10 +14,13 @@ from selfdrive.controls.lib.vehicle_model import VehicleModel
 
 GearShifter = car.CarState.GearShifter
 EventName = car.CarEvent.EventName
+TorqueFromLateralAccelCallbackType = Callable[[float, car.CarParams.LateralTorqueTuning, float, float, float, bool], float]
 
 MAX_CTRL_SPEED = (V_CRUISE_MAX + 4) * CV.KPH_TO_MS
 ACCEL_MAX = 2.0
 ACCEL_MIN = -3.5
+FRICTION_THRESHOLD = 0.3
+
 
 
 # generic car and radar interfaces
@@ -66,6 +69,25 @@ class CarInterfaceBase(ABC):
   @classmethod
   def get_steer_feedforward_function(cls):
     return cls.get_steer_feedforward_default
+  
+  def apply_center_deadzone(error, deadzone):
+    if (error > - deadzone) and (error < deadzone):
+      error = 0.
+    return error
+  
+  @staticmethod
+  def torque_from_lateral_accel_linear(lateral_accel_value, torque_params, lateral_accel_error, lateral_accel_deadzone, vego, friction_compensation):
+    # The default is a linear relationship between torque and lateral acceleration (accounting for road roll and steering friction)
+    friction_interp = interp(
+         (lateral_accel_error, lateral_accel_deadzone),
+      [-FRICTION_THRESHOLD, FRICTION_THRESHOLD],
+      [-torque_params.friction, torque_params.friction]
+    )
+    friction = friction_interp if friction_compensation else 0.0
+    return (lateral_accel_value / torque_params.latAccelFactor) + friction
+
+  def torque_from_lateral_accel(self) -> TorqueFromLateralAccelCallbackType:
+    return self.torque_from_lateral_accel_linear
 
   # returns a set of default params to avoid repetition in car specific params
   @staticmethod
