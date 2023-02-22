@@ -87,8 +87,9 @@ class Controls:
       ignore = ['testJoystick']
       if SIMULATION:
         ignore += ['driverCameraState', 'managerState']
-        if METADRIVE:
-          ignore += ['liveParameters', 'liveTorqueParameters', 'liveLocationKalman']
+        ignore += ['liveParameters', 'liveTorqueParameters', 'liveLocationKalman']
+        #if METADRIVE:
+          #ignore += ['liveParameters', 'liveTorqueParameters', 'liveLocationKalman']
       if self.params.get_bool('WideCameraOnly'):
         ignore += ['roadCameraState']
       self.sm = messaging.SubMaster(['deviceState', 'pandaStates', 'peripheralState', 'modelV2', 'liveCalibration',
