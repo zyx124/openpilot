@@ -62,7 +62,6 @@ class myBridge():
     self._threads.append(threading.Thread(target=Tasks.peripherals, args=(self,)))
     self._threads.append(threading.Thread(target=Tasks.dm, args=(self,)))
     self._threads.append(threading.Thread(target=Tasks.can, args=(self,)))
-    self._threads.append(threading.Thread(target=Tasks.device_state, args=(self,)))
     
     for t in self._threads:
       t.start()      
