@@ -1,5 +1,3 @@
-import os
-import time
 import random
 import threading
 
@@ -7,6 +5,7 @@ from common.params import Params
 import cereal.messaging as messaging
 from tools.streamer.tasks import Tasks 
 from selfdrive.test.helpers import set_params_enabled
+from common.realtime import sec_since_boot, config_realtime_process, Priority, Ratekeeper, DT_CTRL
 
 from metadrive import MetaDriveEnv
 from metadrive.constants import HELP_MESSAGE
@@ -59,14 +58,11 @@ class myBridge():
     return self._exit_event.is_set()
 
   def sub_threads(self):
-    # get os.env variables to delay start of threads
-    delay = int(os.getenv("DELAY"))
-    time.sleep(delay)
     self._threads.append(threading.Thread(target=Tasks.panda, args=(self,)))
     self._threads.append(threading.Thread(target=Tasks.peripherals, args=(self,)))
     self._threads.append(threading.Thread(target=Tasks.dm, args=(self,)))
     self._threads.append(threading.Thread(target=Tasks.can, args=(self,)))
-    #self._threads.append(threading.Thread(target=Tasks.sensors, args=(self,)))
+    self._threads.append(threading.Thread(target=Tasks.device_state, args=(self,)))
     
     for t in self._threads:
       t.start()      
@@ -97,19 +93,20 @@ class myBridge():
       camera_smooth= False,
       show_interface= False,
       physics_world_step_size = 0.02, #.03
-      map="SCSCCCSSCSRSCSCS",
+      map="SCCCC",
       start_seed=random.randint(0, 1000),
       vehicle_config = dict(image_source="rgb_camera", 
                             rgb_camera= (1,1),
                             stack_size=1,
                             rgb_clip=True,
                             show_navi_mark=False,
-                            max_engine_force=5000,
-                            max_brake_force=500,
+                            max_engine_force=2500,
+                            max_brake_force=300,
                             max_steering = 60,
                             wheel_friction=4.0,
                             ),
     )
+
     env = MetaDriveEnv(config)
     #rk = Ratekeeper(4, print_delay_threshold=None)
     try:
@@ -132,6 +129,7 @@ class myBridge():
       env.close()
         
 def main():
+  config_realtime_process(1, Priority.CTRL_HIGH)
   bridge = myBridge() # this is my bridge
   bridge.sub_threads() # this part is nice
   bridge.game_runner() # this is my favorite part

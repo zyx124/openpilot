@@ -2119,9 +2119,9 @@ yapf = "*"
 
 [package.source]
 type = "git"
-url = "https://github.com/jon-chuang/metadrive.git"
-reference = "jon/versioning-hack"
-resolved_reference = "2e6f00b53fab2e2d4806c1cbd0ba2b0610f19a04"
+url = "https://github.com/moretore/metadrive.git"
+reference = "zmq"
+resolved_reference = "b0a808a02b29490461ff6e210d5abfe109488b03"
 
 [[package]]
 name = "mistune"

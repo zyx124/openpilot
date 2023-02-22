@@ -88,7 +88,7 @@ class Controls:
       if SIMULATION:
         ignore += ['driverCameraState', 'managerState']
         if METADRIVE:
-          ignore += ['liveLocationKalman', 'liveParameters', 'liveTorqueParameters']
+          ignore += ['liveParameters', 'liveTorqueParameters', 'liveLocationKalman']
       if self.params.get_bool('WideCameraOnly'):
         ignore += ['roadCameraState']
       self.sm = messaging.SubMaster(['deviceState', 'pandaStates', 'peripheralState', 'modelV2', 'liveCalibration',
@@ -342,10 +342,7 @@ class Controls:
         elif not self.sm.all_freq_ok(self.camera_packets):
           self.events.add(EventName.cameraFrameRate)
     if self.rk.lagging:
-      if not METADRIVE:
         self.events.add(EventName.controlsdLagging)
-      else:
-        print("METADRIVE: controlsdLagging")
     if len(self.sm['radarState'].radarErrors) or not self.sm.all_checks(['radarState']):
       self.events.add(EventName.radarFault)
     if not self.sm.valid['pandaStates']:
@@ -876,6 +873,10 @@ class Controls:
       self.step()
       self.rk.monitor_time()
       self.prof.display()
+      if SIMULATION:
+        self.rk.keep_time()
+    
+    
 
 
 def main(sm=None, pm=None, logcan=None):

@@ -44,6 +44,8 @@ class Tasks:
   def sensors(self):
     sensor_function(self.vs, self._exit_event)
 
+  def device_state(self):
+    device_state_function(self._exit_event)
 
 class Camerad:
   def __init__(self, W, H):
@@ -150,6 +152,15 @@ def panda_state_function(vs: VehicleState, exit_event: threading.Event):
     pm.send('pandaStates', dat)
     time.sleep(0.5)
 
+def device_state_function(exit_event: threading.Event):
+  pm = messaging.PubMaster(['deviceState'])
+  rk = Ratekeeper(20, print_delay_threshold=None)
+  while not exit_event.is_set():
+    dat = messaging.new_message('deviceState')
+    dat.deviceState.freeSpacePercent = 100
+    dat.deviceState.memoryUsagePercent = 0
+    pm.send('deviceState', dat)
+
 def peripheral_state_function(exit_event: threading.Event):
   pm = messaging.PubMaster(['peripheralState'])
   while not exit_event.is_set():
@@ -190,7 +201,7 @@ def fake_driver_monitoring(exit_event: threading.Event):
 
 def can_function_runner(vs: VehicleState, exit_event: threading.Event):
   i = 0
-  rk = Ratekeeper(100, print_delay_threshold=1)
+  rk = Ratekeeper(100, print_delay_threshold=.05)
   pm = messaging.PubMaster(['can'])
   while not exit_event.is_set():
     simulator_can_function(pm, vs.speed, vs.angle, i, vs.cruise_sp, vs.is_engaged)

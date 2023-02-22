@@ -49,7 +49,7 @@ class CarState(CarStateBase):
 
     ret.cruiseState.available = True
     ret.cruiseState.enabled = cp.vl["CRZ_CTRL"]["CRZ_ACTIVE"] == 1
-    ret.cruiseState.standstill = cp.vl["PEDALS"]["STANDSTILL"] == 1
+    ret.cruiseState.standstill = False
     ret.cruiseState.speed = cp.vl["CRZ_EVENTS"]["CRZ_SPEED"] * CV.KPH_TO_MS
     ret.steerFaultTemporary = False
     ret.steerFaultPermanent = False
