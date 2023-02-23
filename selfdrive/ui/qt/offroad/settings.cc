@@ -46,7 +46,7 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "Nudgeless Lane Change",
       "Don't require the driver to turn the steering wheel when changing lanes.",
       "../assets/offroad/icon_openpilot.png",
-    }
+    },
     {
       "IsLdwEnabled",
       "Enable Lane Departure Warnings",
