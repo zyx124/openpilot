@@ -65,7 +65,7 @@ class LatControlTorque(LatControl):
       error = setpoint - measurement
       gravity_adjusted_lateral_accel = desired_lateral_accel - params.roll * ACCELERATION_DUE_TO_GRAVITY
       pid_log.error = self.torque_from_lateral_accel(error, self.torque_params, error,
-                                                     lateral_accel_deadzone, 0.0, CS.vEgo, friction_compensation=False)
+                                                     lateral_accel_deadzone, steering_angle, CS.vEgo, friction_compensation=False)
       ff = self.torque_from_lateral_accel(gravity_adjusted_lateral_accel, self.torque_params,
                                           desired_lateral_accel - actual_lateral_accel,
                                           lateral_accel_deadzone, steering_angle, CS.vEgo, friction_compensation=True)
