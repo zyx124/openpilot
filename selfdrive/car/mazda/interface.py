@@ -25,11 +25,13 @@ class CarInterface(CarInterfaceBase):
     if candidate in GEN2:
       ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda2019)]
       ret.openpilotLongitudinalControl = True
-      ret.stopAccel = 0.0
+      ret.stopAccel = -.5
+      ret.vEgoStarting = .1
       ret.longitudinalTuning.kpBP = [0., 5., 35.]
       ret.longitudinalTuning.kpV = [0.0, 0.0, 0.0]
       ret.longitudinalTuning.kiBP = [0., 35.]
-      ret.longitudinalTuning.kiV = [0.0, 0.0]
+      ret.longitudinalTuning.kiV = [0.1, 0.1]
+      
     ret.radarOffCan = True
 
     ret.dashcamOnly = candidate not in (CAR.CX5_2022, CAR.CX9_2021, CAR.MAZDA3_2019, CAR.CX_30, CAR.CX_50, CAR.CX_60, CAR.CX_70, CAR.CX_80, CAR.CX_90)
