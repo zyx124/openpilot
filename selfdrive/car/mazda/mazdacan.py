@@ -70,6 +70,7 @@ def create_steering_control(packer, car_fingerprint, frame, apply_steer, lkas):
     sig_name = "EPS_LKAS"
     values = {
       "LKAS_REQUEST": apply_steer,
+      "STEER_FEEL": 14000,
     }
 
   return packer.make_can_msg(sig_name, bus, values)
