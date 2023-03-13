@@ -138,7 +138,7 @@ def create_acc_cmd(self, packer, CS, CC, hold, resume):
     bus = 2
 
     if (values["ACC_ENABLED"]):
-      if Params().get_bool("OpenpilotLongitudinalControl"):
+      if Params().get_bool("OpenpilotLongitudinalControl") or Params().get_bool("ExperimentalMode"):
         values["ACCEL_CMD"] = (CC.actuators.accel * 240) + 2000
       values["HOLD"] = hold
       values["RESUME"] = resume
