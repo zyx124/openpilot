@@ -2,7 +2,7 @@
 #define MAZDA_LKAS          0x243
 #define MAZDA_LKAS2         0x249
 #define MAZDA_LKAS_HUD      0x440
-#define MAZDA_CRZ_CTRL      0x21c
+#define MAZDA_CRZ_EVENTS    0x21f
 #define MAZDA_CRZ_BTNS      0x09d
 #define TI_STEER_TORQUE     0x24A
 #define MAZDA_STEER_TORQUE  0x240
@@ -28,7 +28,7 @@ const SteeringLimits MAZDA_STEERING_LIMITS = {
 const CanMsg MAZDA_TX_MSGS[] = {{MAZDA_LKAS, 0, 8}, {MAZDA_CRZ_BTNS, 0, 8}, {MAZDA_LKAS2, 1, 8}, {MAZDA_LKAS_HUD, 0, 8}};
 
 AddrCheckStruct mazda_addr_checks[] = {
-  {.msg = {{MAZDA_CRZ_CTRL,     0, 8, .expected_timestep = 20000U}, { 0 }, { 0 }}},
+  {.msg = {{MAZDA_CRZ_EVENTS,   0, 8, .expected_timestep = 20000U}, { 0 }, { 0 }}},
   {.msg = {{MAZDA_CRZ_BTNS,     0, 8, .expected_timestep = 100000U}, { 0 }, { 0 }}},
   {.msg = {{MAZDA_STEER_TORQUE, 0, 8, .expected_timestep = 12000U}, { 0 }, { 0 }}},
   {.msg = {{MAZDA_ENGINE_DATA,  0, 8, .expected_timestep = 10000U}, { 0 }, { 0 }}},
@@ -71,8 +71,8 @@ static int mazda_rx_hook(CANPacket_t *to_push) {
     }
 
     // enter controls on rising edge of ACC, exit controls on ACC off
-    if (addr == MAZDA_CRZ_CTRL) {
-      bool cruise_engaged = GET_BYTE(to_push, 0) & 0x8U;
+    if (addr == MAZDA_CRZ_EVENTS) {
+      bool cruise_engaged = GET_BYTE(to_push, 2) & 0x80U;
       pcm_cruise_check(cruise_engaged);
     }
 
@@ -114,7 +114,6 @@ static int mazda_tx_hook(CANPacket_t *to_send, bool longitudinal_allowed) {
     // steer cmd checks
     if (addr == MAZDA_LKAS) {
       int desired_torque = (((GET_BYTE(to_send, 0) & 0x0FU) << 8) | GET_BYTE(to_send, 1)) - 2048U;
-
       if (steer_torque_cmd_checks(desired_torque, -1, MAZDA_STEERING_LIMITS)) {
         tx = 0;
       }
