@@ -363,6 +363,27 @@ FW_VERSIONS = {
     ],
   },
   
+  CAR.CX_30 : {
+    (Ecu.eps, 0x730, None): [
+      b'BDGF-3216X-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    ],
+    (Ecu.engine, 0x7e0, None): [
+      b'PX06-188K2-S\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.fwdRadar, 0x764, None): [
+      b'B0N2-67XK2-A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.abs, 0x760, None): [
+      b'BCKA-4300F-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.fwdCamera, 0x706, None): [
+      b'BDGF-67WK2-C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+    (Ecu.transmission, 0x7e1, None): [
+      b'PX01-21PS1-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
+  },
+  
   CAR.CX_50 : {
     (Ecu.eps, 0x730, None): [
       b'VA40-3216Y-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
@@ -387,6 +408,7 @@ FW_VERSIONS = {
       b'PX4K-21PS1-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
   },
+  
 }
 
 
