@@ -45,7 +45,7 @@ class CarState(CarStateBase):
 
     ret.steeringAngleDeg = cp_cam.vl["STEER"]["STEER_ANGLE"]
     
-    ret.steeringTorque = cp_body.vl["EPS_FEEDBACK"]["STEER_TORQUE_SENSOR"]
+    ret.steeringTorque = 0 #cp_body.vl["EPS_FEEDBACK"]["STEER_TORQUE_SENSOR"]
     can_gear = int(cp_cam.vl["GEAR"]["GEAR"])
     ret.gas = cp_cam.vl["ENGINE_DATA"]["PEDAL_GAS"]
     
@@ -344,10 +344,10 @@ class CarState(CarStateBase):
     checks = []
     if CP.carFingerprint in GEN2:
       signals += [
-        ("STEER_TORQUE_SENSOR", "EPS_FEEDBACK", 0),
+        #("STEER_TORQUE_SENSOR", "EPS_FEEDBACK", 0),
       ]
       checks += [
-        ("EPS_FEEDBACK", 50),
+        #("EPS_FEEDBACK", 50),
       ]
       
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 1)
