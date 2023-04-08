@@ -70,7 +70,7 @@ class LatControlTorque(LatControl):
       pid_log.error = torque_from_setpoint - torque_from_measurement
       ff = self.torque_from_lateral_accel(gravity_adjusted_lateral_accel, self.torque_params,
                                           desired_lateral_accel - actual_lateral_accel,
-                                          lateral_accel_deadzone,0.0, 0.0, friction_compensation=True)
+                                          lateral_accel_deadzone,steering_angle, 0.0, friction_compensation=True)
 
       freeze_integrator = steer_limited or CS.steeringPressed or CS.vEgo < 5
       output_torque = self.pid.update(pid_log.error,
