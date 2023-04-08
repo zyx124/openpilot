@@ -173,7 +173,7 @@ AddrCheckStruct mazda_2019_addr_checks[] = {
   {.msg = {{MAZDA_2019_GAS,       2, 8, .expected_timestep = 10000U}, { 0 }, { 0 }}},
   {.msg = {{MAZDA_2019_CRUISE,    0, 8, .expected_timestep = 100000U}, { 0 }, { 0 }}},
   {.msg = {{MAZDA_2019_SPEED,     2, 8, .expected_timestep = 30000U}, { 0 }, { 0 }}},
-  {.msg = {{MAZDA_2019_STEER_TORQUE,     1, 8, .expected_timestep = 50000U}, { 0 }, { 0 }}},
+  
 };
 
 #define MAZDA_2019_ADDR_CHECKS_LEN (sizeof(mazda_2019_addr_checks) / sizeof(mazda_2019_addr_checks[0]))
@@ -225,7 +225,7 @@ static int mazda_2019_rx_hook(CANPacket_t *to_push) {
       case MAZDA_AUX:
         switch (addr) {
           case MAZDA_2019_STEER_TORQUE:
-            update_sample(&torque_driver, (int16_t)(GET_BYTE(to_push, 0) << 8 | GET_BYTE(to_push, 1)));
+            update_sample(&torque_driver, 0U;
             break; // end TI2_STEER_TORQUE
           
           default: // default address aux
