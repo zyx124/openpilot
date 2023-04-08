@@ -345,13 +345,9 @@ class CarState(CarStateBase):
     if CP.carFingerprint in GEN2:
       signals += [
         ("STEER_TORQUE_SENSOR", "EPS_FEEDBACK", 0),
-        ("HALL2", "EPS_FEEDBACK2", 0),
-        ("HALL3", "EPS_FEEDBACK2", 0),
-        ("HALL4", "EPS_FEEDBACK2", 0),
       ]
       checks += [
         ("EPS_FEEDBACK", 50),
-        ("EPS_FEEDBACK2", 50),
       ]
       
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 1)
