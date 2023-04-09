@@ -225,7 +225,7 @@ static int mazda_2019_rx_hook(CANPacket_t *to_push) {
       case MAZDA_AUX:
         switch (addr) {
           case MAZDA_2019_STEER_TORQUE:
-            update_sample(&torque_driver, 0U;
+            update_sample(&torque_driver, 0U);
             break; // end TI2_STEER_TORQUE
           
           default: // default address aux
