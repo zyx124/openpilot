@@ -179,6 +179,7 @@ ExperimentalButton::ExperimentalButton(QWidget *parent) : QPushButton(parent) {
   setVisible(false);
   setFixedSize(btn_size, btn_size);
   setCheckable(true);
+  installEventFilter(this); // ignore double tap/click events
 
   params = Params();
   engage_img = loadPixmap("../assets/img_chffr_wheel.png", {img_size, img_size});
@@ -220,6 +221,12 @@ void ExperimentalButton::paintEvent(QPaintEvent *event) {
   p.drawPixmap((btn_size - img_size) / 2, (btn_size - img_size) / 2, img);
 }
 
+bool ExperimentalButton::eventFilter(QObject *watched, QEvent *event) {
+  if (event->type() == QEvent::MouseButtonDblClick) {
+    return true; // Ignore double click events
+  }
+  return QPushButton::eventFilter(watched, event); // Process other events normally
+}
 
 AnnotatedCameraWidget::AnnotatedCameraWidget(VisionStreamType type, QWidget* parent) : fps_filter(UI_FREQ, 3, 1. / UI_FREQ), CameraWidget("camerad", type, true, parent) {
   pm = std::make_unique<PubMaster, const std::initializer_list<const char *>>({"uiDebug"});

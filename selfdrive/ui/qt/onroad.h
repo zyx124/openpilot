@@ -42,6 +42,9 @@ private:
   Params params;
   QPixmap engage_img;
   QPixmap experimental_img;
+
+protected:
+  bool eventFilter(QObject *watched, QEvent *event) override;
 };
 
 // container window for the NVG UI
