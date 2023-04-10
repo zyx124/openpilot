@@ -2,6 +2,14 @@ import os
 Import('env', 'qt_env', 'arch', 'common', 'messaging', 'visionipc', 'replay_lib',
        'cereal', 'transformations', 'widgets')
 
+def is_built_on_wsl():
+    try:
+        with open('/proc/version', 'r') as f:
+            contents = f.read() # e.g. 'Linux version 5.10.102.1-microsoft-standard-WSL2 ...'
+        return 'WSL2' in contents
+    except FileNotFoundError:
+        return False
+      
 base_frameworks = qt_env['FRAMEWORKS']
 base_libs = [common, messaging, cereal, visionipc, transformations, 'zmq',
              'capnp', 'kj', 'm', 'ssl', 'crypto', 'pthread'] + qt_env["LIBS"]
@@ -20,6 +28,8 @@ cabana_env["LIBPATH"] += ['../../opendbc/can']
 cabana_libs = [widgets, cereal, messaging, visionipc, replay_lib, 'libdbc_static', 'avutil', 'avcodec', 'avformat', 'bz2', 'curl', 'yuv'] + qt_libs
 opendbc_path = '-DOPENDBC_FILE_PATH=\'"%s"\'' % (cabana_env.Dir("../../opendbc").abspath)
 cabana_env['CXXFLAGS'] += [opendbc_path]
+if is_built_on_wsl():
+    cabana_env.Append(CXXFLAGS=['-DWSL2'])
 
 # build assets
 assets = "assets/assets.cc"

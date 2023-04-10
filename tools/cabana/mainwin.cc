@@ -193,6 +193,12 @@ void MainWindow::createDockWindows() {
   video_dock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
   video_dock->setWidget(video_splitter);
   addDockWidget(Qt::RightDockWidgetArea, video_dock);
+
+// check if WSL2, if so, change features for video_dock and dock to not allow floating
+#ifdef WSL2
+  video_dock->setFeatures(QDockWidget::DockWidgetMovable);
+  dock->setFeatures(QDockWidget::DockWidgetMovable);
+#endif
 }
 
 void MainWindow::createStatusBar() {
