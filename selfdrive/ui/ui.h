@@ -177,10 +177,12 @@ public:
 private:
   bool awake = false;
   int interactive_timeout = 0;
+  int delay_shutdown_timeout = 0;
   bool ignition_on = false;
   int last_brightness = 0;
   FirstOrderFilter brightness_filter;
   QFuture<void> brightness_future;
+
 
   void updateBrightness(const UIState &s);
   void updateWakefulness(const UIState &s);
@@ -190,6 +192,7 @@ private:
 signals:
   void displayPowerChanged(bool on);
   void interactiveTimout();
+  void delayShutdownTimeout();
 
 public slots:
   void resetInteractiveTimout();

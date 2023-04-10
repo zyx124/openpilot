@@ -300,7 +300,13 @@ void Device::setAwake(bool on) {
 }
 
 void Device::resetInteractiveTimout() {
-  interactive_timeout = (ignition_on ? 10 : 30) * UI_FREQ;
+  if (ignition_on) {
+    interactive_timeout = 10 * UI_FREQ; // 10 seconds
+  } else {
+    interactive_timeout = 30 * UI_FREQ; // 30 seconds
+    delay_shutdown_timeout = (300) * UI_FREQ;
+    Params().putBool("DelayShutdown", true); // disable shutdown for 5 minutes
+  }
 }
 
 void Device::updateBrightness(const UIState &s) {
@@ -340,6 +346,8 @@ void Device::updateWakefulness(const UIState &s) {
     resetInteractiveTimout();
   } else if (interactive_timeout > 0 && --interactive_timeout == 0) {
     emit interactiveTimout();
+  } else if (delay_shutdown_timeout > 0 && --delay_shutdown_timeout == 0) {
+    emit delayShutdownTimeout();
   }
 
   setAwake(s.scene.ignition || interactive_timeout > 0);

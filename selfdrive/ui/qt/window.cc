@@ -43,6 +43,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
       closeSettings();
     }
   });
+  QObject::connect(&device, &Device::delayShutdownTimeout, [=]() {
+    Params().putBool("DelayShutdown", false);
+  });
 
   // load fonts
   QFontDatabase::addApplicationFont("../assets/fonts/Inter-Black.ttf");

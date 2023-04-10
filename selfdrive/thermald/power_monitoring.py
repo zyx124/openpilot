@@ -123,6 +123,7 @@ class PowerMonitoring:
     should_shutdown |= (self.car_battery_capacity_uWh <= 0)
     should_shutdown &= not ignition
     should_shutdown &= (not self.params.get_bool("DisablePowerDown"))
+    should_shutdown &= (not self.params.get_bool("DelayShutdown"))
     should_shutdown &= in_car
     should_shutdown |= self.params.get_bool("ForcePowerDown")
     should_shutdown &= started_seen or (now > MIN_ON_TIME_S)
