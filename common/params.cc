@@ -158,6 +158,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"ObdMultiplexingChanged", CLEAR_ON_MANAGER_START | CLEAR_ON_IGNITION_ON},
     {"ObdMultiplexingEnabled", CLEAR_ON_MANAGER_START | CLEAR_ON_IGNITION_ON},
     {"OpenpilotEnabledToggle", PERSISTENT},
+    {"OpenpilotLongitudinalControl", PERSISTENT},
     {"PandaHeartbeatLost", CLEAR_ON_MANAGER_START | CLEAR_ON_IGNITION_OFF},
     {"PandaSignatures", CLEAR_ON_MANAGER_START},
     {"Passive", PERSISTENT},
