@@ -21,6 +21,7 @@
 #include "selfdrive/ui/qt/widgets/scrollview.h"
 #include "selfdrive/ui/qt/widgets/ssh_keys.h"
 #include "selfdrive/ui/qt/widgets/toggle.h"
+#include "selfdrive/ui/qt/widgets/slider.h"
 #include "selfdrive/ui/ui.h"
 #include "selfdrive/ui/qt/util.h"
 #include "selfdrive/ui/qt/qt_window.h"
@@ -313,6 +314,35 @@ void DevicePanel::poweroff() {
   }
 }
 
+BehaviorPanel::BehaviorPanel(SettingsWindow *parent) : ListWidget(parent){
+  
+  std::vector<std::tuple<QString, QString, QString, double, double, double>> slider_defs{
+    // param, title, unit, paramMin, paramMax, defaultVal
+    //{"Slider1", tr("Slider 1:"), "m/s<sup>2</sup>", 0.0, 1.0, 0.0},
+  };
+  if (slider_defs.size() == 0) {
+    QLabel *noSliders = new QLabel("No behaviour adjustments available.");
+    noSliders->setStyleSheet("font-size: 50px; color: #999999;");
+    noSliders->setAlignment(Qt::AlignCenter);
+    addItem(noSliders);
+  }
+
+  for (const auto &slider_def : slider_defs) {
+    QString param = std::get<0>(slider_def); 
+    QString title = std::get<1>(slider_def); 
+    QString unit = std::get<2>(slider_def);
+    double paramMin = std::get<3>(slider_def);
+    double paramMax = std::get<4>(slider_def);
+    double defaultVal = std::get<5>(slider_def);
+    
+    //bool locked = Params().getBool((param + "Lock").toStdString());
+    CustomSlider *slider = new CustomSlider(param, title, unit, paramMin, paramMax, defaultVal, params, Qt::Horizontal, this);
+    sliderItems[param.toStdString()] = slider->getSliderItem();
+    addItem(slider->getSliderItem());
+
+  }
+}
+
 void SettingsWindow::showEvent(QShowEvent *event) {
   setCurrentPanel(0);
 }
@@ -371,6 +401,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QFrame(parent) {
     {tr("Network"), new Networking(this)},
     {tr("Toggles"), toggles},
     {tr("Software"), new SoftwarePanel(this)},
+    {tr("Behavior"), new BehaviorPanel(this)},
   };
 
 #ifdef ENABLE_MAPS
