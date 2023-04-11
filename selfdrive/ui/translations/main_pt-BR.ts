@@ -102,6 +102,21 @@
     </message>
 </context>
 <context>
+    <name>CustomSlider</name>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">Resetar</translation>
+    </message>
+    <message>
+        <source>RESET</source>
+        <translation type="unfinished">RESET</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to reset </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DeclinePage</name>
     <message>
         <source>You must accept the Terms and Conditions in order to use openpilot.</source>
@@ -634,6 +649,10 @@ Isso pode levar até um minuto.</translation>
     <message>
         <source>Navigation</source>
         <translation>Navegação</translation>
+    </message>
+    <message>
+        <source>Behavior</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
