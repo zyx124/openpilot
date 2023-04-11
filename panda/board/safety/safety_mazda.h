@@ -180,7 +180,7 @@ AddrCheckStruct mazda_2019_addr_checks[] = {
 addr_checks mazda_2019_rx_checks = {mazda_2019_addr_checks, MAZDA_2019_ADDR_CHECKS_LEN};
 
 static int mazda_2019_rx_hook(CANPacket_t *to_push) {
-  bool valid = addr_safety_check(to_push, &mazda_2019_rx_checks, NULL, NULL, NULL);
+  bool valid = addr_safety_check(to_push, &mazda_2019_rx_checks, NULL, NULL, NULL, NULL);
   static bool cruise_engaged;
   static int speed;
   if (valid) {
