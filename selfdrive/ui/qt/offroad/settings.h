@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QWidget>
+#include <QSlider>
+#include <QScrollArea>
 
 
 #include "selfdrive/ui/qt/widgets/controls.h"
@@ -66,6 +68,18 @@ private:
   std::map<std::string, ParamControl*> toggles;
 
   void updateToggles();
+};
+
+class BehaviorPanel : public ListWidget {
+  Q_OBJECT
+
+public:
+  explicit BehaviorPanel(SettingsWindow *parent);
+
+private:
+  Params params; 
+  std::map<std::string, QWidget *> sliderItems;
+  
 };
 
 class SoftwarePanel : public ListWidget {
