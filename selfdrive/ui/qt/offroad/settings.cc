@@ -324,7 +324,8 @@ BehaviorPanel::BehaviorPanel(SettingsWindow *parent) : ListWidget(parent){
   
   std::vector<std::tuple<QString, QString, QString, double, double, double>> slider_defs{
     // param, title, unit, paramMin, paramMax, defaultVal
-    //{"Slider1", tr("Slider 1:"), "m/s<sup>2</sup>", 0.0, 1.0, 0.0},
+    // {"AccelTargetOffset", tr("Accel Target Offset:"), "m/s<sup>2</sup>", -1.0, 1.0, 0.0},
+    {"ComfortBrake", tr("Comfort Brake:"), "m/s", 1.0, 2.8, 2.5},
   };
   if (slider_defs.size() == 0) {
     QLabel *noSliders = new QLabel("No behaviour adjustments available.");

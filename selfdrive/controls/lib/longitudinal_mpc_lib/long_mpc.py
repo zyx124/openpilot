@@ -4,6 +4,7 @@ import numpy as np
 
 from common.realtime import sec_since_boot
 from common.numpy_fast import clip
+from common.params import Params 
 from system.swaglog import cloudlog
 # WARNING: imports outside of constants will not trigger a rebuild
 from selfdrive.modeld.constants import index_function
@@ -58,11 +59,22 @@ T_FOLLOW = 1.45
 COMFORT_BRAKE = 2.5
 STOP_DISTANCE = 6.0
 
+p = Params()
+if p.get("ComfortBrake") is None:
+  p.put("ComfortBrake", str(COMFORT_BRAKE))
+
+def get_comfort_brake():
+  try:
+    cb = float(p.get("ComfortBrake", COMFORT_BRAKE))
+  except:
+    cb = COMFORT_BRAKE
+  return cb if cb > 1 and cb < 2.8 else COMFORT_BRAKE
+
 def get_stopped_equivalence_factor(v_lead):
-  return (v_lead**2) / (2 * COMFORT_BRAKE)
+  return (v_lead**2) / (2 * get_comfort_brake())
 
 def get_safe_obstacle_distance(v_ego, t_follow=T_FOLLOW):
-  return (v_ego**2) / (2 * COMFORT_BRAKE) + t_follow * v_ego + STOP_DISTANCE
+  return (v_ego**2) / (2 * get_comfort_brake()) + t_follow * v_ego + STOP_DISTANCE
 
 def desired_follow_distance(v_ego, v_lead):
   return get_safe_obstacle_distance(v_ego) - get_stopped_equivalence_factor(v_lead)
