@@ -60,8 +60,8 @@ COMFORT_BRAKE = 2.5
 STOP_DISTANCE = 6.0
 
 p = Params()
-if p.get("ComfortBrake") is None:
-  p.put("ComfortBrake", str(COMFORT_BRAKE))
+#if p.get("ComfortBrake") is None:
+p.put("ComfortBrake", str(COMFORT_BRAKE))
 
 def get_comfort_brake():
   try:
