@@ -14,7 +14,7 @@ class CustomSlider : public QSlider {
 
 public:
   explicit CustomSlider(const QString &param, const QString &title, const QString &unit, double paramMin, double paramMax, double defaultVal, Params &params, Qt::Orientation orientation, QWidget *parent = nullptr)
-      : QSlider(orientation, parent), param(param), title(title), unit(unit), paramMin(paramMin), paramMax(paramMax), params(params) {
+      : QSlider(orientation, parent), param(param), title(title), unit(unit), paramMin(paramMin), paramMax(paramMax), defaultVal(defaultVal), params(params) {
     initialize();
   }
 
