@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import os
 import numpy as np
-
+from cereal import log
+from cereal.messaging import SubMaster
 from common.realtime import sec_since_boot
 from common.numpy_fast import clip
 from common.params import Params 
@@ -61,14 +62,15 @@ STOP_DISTANCE = 6.0
 
 p = Params()
 #if p.get("ComfortBrake") is None:
-p.put("ComfortBrake", str(COMFORT_BRAKE))
-
+#p.put("ComfortBrake", str(COMFORT_BRAKE))
+sm = SubMaster(['behavior'])
 def get_comfort_brake():
-  try:
-    cb = float(p.get("ComfortBrake", COMFORT_BRAKE))
-  except:
-    cb = COMFORT_BRAKE
-  return cb if cb > 1 and cb < 2.8 else COMFORT_BRAKE
+  sm.update(0)
+  cb = COMFORT_BRAKE
+  if sm.updated['behavior']:
+    cb = sm['behavior'].comfortBrake
+    cb = cb if cb > 1 and cb < 2.8 else COMFORT_BRAKE
+  return cb
 
 def get_stopped_equivalence_factor(v_lead):
   return (v_lead**2) / (2 * get_comfort_brake())
