@@ -8,6 +8,7 @@
 #include <QPushButton>
 
 #include "common/params.h"
+#include "selfdrive/ui/ui.h"
 
 class CustomSlider : public QSlider {
   Q_OBJECT
@@ -33,6 +34,9 @@ protected:
 
 private:
   void initialize();
+  void sliderReleasedWithValueHandler(int value);
+
+  std::unique_ptr<PubMaster> pm;
 
   QString param;
   QString title;
