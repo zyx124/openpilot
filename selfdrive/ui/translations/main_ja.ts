@@ -96,6 +96,10 @@
         <source>Comfort Brake:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Accel Target Offset:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConfirmationDialog</name>

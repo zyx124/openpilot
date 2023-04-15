@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 
+#include <functional>
 #include "common/params.h"
 #include "selfdrive/ui/ui.h"
 
@@ -15,14 +16,22 @@ class CustomSlider : public QSlider {
   Q_OBJECT
 
 public:
-  explicit CustomSlider(const QString &param, const QString &title, const QString &unit, double paramMin, double paramMax, double defaultVal, Params &params, Qt::Orientation orientation, QWidget *parent = nullptr)
-      : QSlider(orientation, parent), param(param), title(title), unit(unit), paramMin(paramMin), paramMax(paramMax), defaultVal(defaultVal), params(params) {
-    initialize();
-  }
+  using CerealSetterFunction = std::function<void(cereal::Behavior::Builder&, double)>;
+
+  CustomSlider(const QString &param, CerealSetterFunction cerealSetFunc, 
+                           const QString &unit, const QString &title, 
+                           double paramMin, double paramMax, double defaultVal, QWidget *parent = nullptr);
+
 
   QWidget *getSliderItem() {
     return sliderItem;
   }
+  CerealSetterFunction cerealSetFunc;
+
+  double paramMin;
+  double paramMax;
+  int sliderMin = 0;
+  int sliderMax = 10000;
 
 signals:
   void sliderReleasedWithValue(int value);
@@ -33,28 +42,19 @@ protected:
     emit sliderReleasedWithValue(value());
   }
 
-public Q_SLOTS:
-    void sendSliderValue();
-
 private:
   void initialize();
+  
 
-  static std::shared_ptr<PubMaster> pm;
-  QTimer *timer;
+  double defaultVal;
+  double scaleFactor;
   QString param;
   QString title;
   QString unit;
-  double paramMin;
-  double paramMax;
-  double paramRange = paramMax - paramMin;
-  double defaultVal;
-  double scaleFactor;
-  Params &params;
 
   QWidget *sliderItem;
   QLabel *label;
-  int sliderMin = 0;
-  int sliderMax = 10000;
+  
   int sliderRange = sliderMax - sliderMin;
 
   QString SliderStyle = R"(
