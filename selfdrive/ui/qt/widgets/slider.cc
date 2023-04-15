@@ -1,6 +1,8 @@
 #include "selfdrive/ui/qt/widgets/slider.h"
 #include "selfdrive/ui/qt/widgets/controls.h"
 
+std::shared_ptr<PubMaster> CustomSlider::pm = nullptr;
+
 void CustomSlider::initialize()
 {
 
@@ -14,8 +16,9 @@ void CustomSlider::initialize()
   label->setStyleSheet(LabelStyle);
   label->setTextFormat(Qt::RichText);
   titleLayout->addWidget(label, 0, Qt::AlignLeft);
-
-  pm = std::make_unique<PubMaster, const std::initializer_list<const char *>>({"behavior"});
+  if(!pm) {
+    pm = std::make_unique<PubMaster, const std::initializer_list<const char *>>({"behavior"});
+  } 
   ButtonControl *resetButton = new ButtonControl("        ", tr("RESET"));
   connect(resetButton, &ButtonControl::clicked, [&]()
           {
@@ -37,15 +40,22 @@ void CustomSlider::initialize()
   setValue(sliderMin + (defaultVal - paramMin) / (paramMax - paramMin) * (sliderMax - sliderMin));
   label->setText(title + " " + QString::number(defaultVal, 'f', 2) + " " + unit);
 
+  timer = new QTimer(this);
+  timer->setInterval(1000); // Interval of 1000 ms (1 second)
+  timer->start();
+
   try
   {
     QString valueStr = QString::fromStdString(Params().get(param.toStdString()));
     double value = QString(valueStr).toDouble();
     val.setComfortBrake(value);
     pm->send("behavior", msg);
-    
+
     setValue(sliderMin + (value - paramMin) / (paramMax - paramMin) * (sliderMax - sliderMin)); // Set the value of the slider. The value is scaled to the slider range
     label->setText(title + " " + QString::number(value, 'f', 2) + " " + unit);
+
+    connect(timer, &QTimer::timeout, this, &CustomSlider::sendSliderValue);
+
     if (Params().getBool((param + "Lock").toStdString()))
     {
       setEnabled(false);
@@ -78,13 +88,15 @@ void CustomSlider::initialize()
     
   });
 
-connect(this, &CustomSlider::sliderReleasedWithValue, [this](int value) {
-    this->sliderReleasedWithValueHandler(value);
-});
+  connect(this, &CustomSlider::sliderReleasedWithValue, [this](int value) {
+      this->sendSliderValue();
+  });
 
 }
 
-void CustomSlider::sliderReleasedWithValueHandler(int value) {
+void CustomSlider::sendSliderValue()
+{
+    int value = this->value();
     double dValue = paramMin + (paramMax - paramMin) * (value - sliderMin) / (sliderMax - sliderMin);
     MessageBuilder msg;
     auto val = msg.initEvent().initBehavior();

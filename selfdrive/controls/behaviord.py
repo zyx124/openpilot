@@ -2,32 +2,43 @@
 
 """ gets behavior input from UI and saves it to params"""
 from common.params import Params
-from cereal.messaging import SubMaster
+import cereal.messaging as messaging
 import time
 
-sm = SubMaster(['behavior'])
-p = Params()
 
-def init_params():
-  if p.get("ComfortBrake") is None:
-    p.put("ComfortBrake", "0")
-  # Add more params here
-        
-def save():
-  if sm.updated['behavior']:
-    p.put("ComfortBrake", str(sm['behavior'].comfortBrake))
-    # Add more params here
+
+
+
+class Behaviord:
+  def __init__(self):
     
-def behavior_thread():
-  init_params()
-  while 1:
-    sm.update(0)
-    save()
-    time.sleep(1)
+    sm = messaging.SubMaster(['behavior'])
+    self.sm = sm
+    self.p = Params()
+    self.init_params()
+
+  
+  def init_params(self):
+    if self.p.get("ComfortBrake") is None:
+      self.p.put("ComfortBrake", "0")
+
+  def save(self):
+    if self.sm.updated['behavior']:
+      print("behavior updated")
+      self.p.put("ComfortBrake", str(self.sm['behavior'].comfortBrake))
+      # Add more params here
+
+  def behaviord_thread(self):
+    while 1:
+      self.sm.update(0)
+      self.save()
+      #self.send()
+      time.sleep(1)
 
 def main():
-  behavior_thread()   
+  behaviord = Behaviord()
+  behaviord.behaviord_thread() 
             
 if __name__ == "__main__":
-  behavior_thread()
+  main()
             

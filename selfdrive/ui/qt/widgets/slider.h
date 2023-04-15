@@ -1,4 +1,5 @@
 #pragma once
+#include <QTimer>
 #include <QLabel>
 #include <QSlider>
 #include <QWidget>
@@ -32,12 +33,14 @@ protected:
     emit sliderReleasedWithValue(value());
   }
 
+public Q_SLOTS:
+    void sendSliderValue();
+
 private:
   void initialize();
-  void sliderReleasedWithValueHandler(int value);
 
-  std::unique_ptr<PubMaster> pm;
-
+  static std::shared_ptr<PubMaster> pm;
+  QTimer *timer;
   QString param;
   QString title;
   QString unit;

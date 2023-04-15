@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 import os
 import numpy as np
-from cereal import log
 from cereal.messaging import SubMaster
 from common.realtime import sec_since_boot
 from common.numpy_fast import clip
-from common.params import Params 
 from system.swaglog import cloudlog
 # WARNING: imports outside of constants will not trigger a rebuild
 from selfdrive.modeld.constants import index_function
@@ -60,17 +58,24 @@ T_FOLLOW = 1.45
 COMFORT_BRAKE = 2.5
 STOP_DISTANCE = 6.0
 
-p = Params()
-#if p.get("ComfortBrake") is None:
-#p.put("ComfortBrake", str(COMFORT_BRAKE))
-sm = SubMaster(['behavior'])
+class liveBehavior():
+  def __init__(self):
+    self.comfort_brake = COMFORT_BRAKE
+    self.sm = SubMaster(['behavior'])
+  
+  def get_live_comfort_brake(self):
+    self.sm.update(0)
+    if self.sm.updated['behavior']:
+      cb = self.sm['behavior'].comfortBrake
+      self.comfort_brake = cb if cb > 1 and cb < 2.8 else COMFORT_BRAKE
+    print("comfort_brake: ", self.comfort_brake)
+    return self.comfort_brake
+
+lb = liveBehavior()
+
 def get_comfort_brake():
-  sm.update(0)
-  cb = COMFORT_BRAKE
-  if sm.updated['behavior']:
-    cb = sm['behavior'].comfortBrake
-    cb = cb if cb > 1 and cb < 2.8 else COMFORT_BRAKE
-  return cb
+  
+  return lb.get_live_comfort_brake()
 
 def get_stopped_equivalence_factor(v_lead):
   return (v_lead**2) / (2 * get_comfort_brake())
