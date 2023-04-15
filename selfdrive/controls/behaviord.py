@@ -2,7 +2,6 @@
 
 """ gets behavior input from UI and saves it to params"""
 from common.params import Params
-from cereal import log
 from cereal.messaging import SubMaster
 import time
 
@@ -25,7 +24,9 @@ def behavior_thread():
     sm.update(0)
     save()
     time.sleep(1)
-            
+
+def main():
+  behavior_thread()   
             
 if __name__ == "__main__":
   behavior_thread()
