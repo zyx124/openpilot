@@ -157,7 +157,7 @@ bool safety_setter_thread(std::vector<Panda *> pandas) {
   }
   LOGW("got %d bytes CarParams", params.size());
 
-  AlignedBuffer aligned_buf; // 64 byte aligned buffer
+  AlignedBuffer aligned_buf;
   capnp::FlatArrayMessageReader cmsg(aligned_buf.align(params.data(), params.size())); 
   cereal::CarParams::Reader car_params = cmsg.getRoot<cereal::CarParams>(); // 
   cereal::CarParams::SafetyModel safety_model;
