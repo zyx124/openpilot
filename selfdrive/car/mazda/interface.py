@@ -83,7 +83,7 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 2.7
       ret.steerRatio = 15.5
       ret.steerActuatorDelay = 0.1
-      ret.lateralTuning.torque.latAngleFactor = .05
+      ret.lateralTuning.torque.latAngleFactor = .1
     elif candidate in (CAR.CX_60, CAR.CX_80, CAR.CX_70, CAR.CX_90):
       ret.mass = 4217 * CV.LB_TO_KG + STD_CARGO_KG
       ret.wheelbase = 3.1
