@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from collections import defaultdict
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Set, DefaultDict, Tuple, Type, Optional
 from tqdm import tqdm
 
 import panda.python.uds as uds
@@ -46,48 +46,105 @@ def get_brand_addrs():
   return brand_addrs
 
 
-def match_fw_to_car_fuzzy(fw_versions_dict, log=True, exclude=None):
-  """Do a fuzzy FW match. This function will return a match, and the number of firmware version
-  that were matched uniquely to that specific car. If multiple ECUs uniquely match to different cars
-  the match is rejected."""
+def match_fw_to_car_fuzzy(fw_versions_dict, log: bool=True, exclude: Optional[str]=None) -> Set[str]:
+  """
+  Perform a fuzzy match of firmware versions to car models.
 
-  # These ECUs are known to be shared between models (EPS only between hybrid/ICE version)
-  # Getting this exactly right isn't crucial, but excluding camera and radar makes it almost
-  # impossible to get 3 matching versions, even if two models with shared parts are released at the same
-  # time and only one is in our database.
-  exclude_types = [Ecu.fwdCamera, Ecu.fwdRadar, Ecu.eps, Ecu.debug]
+  Args:
+    fw_versions_dict (dict): A dictionary containing firmware versions.
+    log (bool, optional): If True, log the fingerprinting results. Defaults to True.
+    exclude (str, optional): Exclude a specific car model from matching. Defaults to None.
 
-  # Build lookup table from (addr, sub_addr, fw) to list of candidate cars
-  all_fw_versions = defaultdict(list)
+  Returns:
+    set: A set containing the matched car model, or an empty set if no match is found."""
+    
+  excluded_types = [Ecu.fwdCamera, Ecu.fwdRadar, Ecu.eps, Ecu.debug]
+  # These ECUs are known to be shared between models (EPS only between hybrid/ICE version). Getting this exactly
+  # right isn't crucial, but excluding camera and radar makes it almost impossible to get 3 matching versions,
+  # even if two models with shared parts are released at the same time and only one is in our database.
+  
+  fw_versions = create_fw_version_lookups(excluded_types, exclude) # fw_versions [included, excluded]
+  included_match_counts, excluded_match_count, included_candidates, excluded_candidates = count_fw_matches(fw_versions_dict, *fw_versions)
+  return determine_match_result(included_match_counts, excluded_match_count, included_candidates, excluded_candidates, log)
+
+def create_fw_version_lookups(excluded_types: list, exclude: str=None) -> List[DefaultDict[Any, List[Any]]]:
+  """Create firmware version lookup tables for included and excluded types.
+
+  Args:
+    excluded_types (list): List of ECU types to exclude.
+    exclude (str): Exclude a specific car model from matching.
+    
+
+  Returns:
+    tuple: Tuple containing included and excluded firmware version lookup dictionaries."""
+  fw_versions: List[DefaultDict[Tuple[int, int, bytes], List[str]]] = [defaultdict(list), defaultdict(list)]
   for candidate, fw_by_addr in FW_VERSIONS.items():
-    if candidate == exclude:
+    if candidate == exclude: 
       continue
-
     for addr, fws in fw_by_addr.items():
-      if addr[0] in exclude_types:
-        continue
       for f in fws:
-        all_fw_versions[(addr[1], addr[2], f)].append(candidate)
+        key = (addr[1], addr[2], f)
+        fw_versions[addr[0] in excluded_types][key].append(candidate)
+  return fw_versions
 
-  match_count = 0
-  candidate = None
+def count_fw_matches(fw_versions_dict: dict, included_fw_versions: DefaultDict[Tuple[int, int, bytes], List[str]], 
+                     excluded_fw_versions: DefaultDict[Tuple[int, int, bytes], List[str]]) -> tuple:
+  """Count firmware matches for included and excluded candidates.
+
+  Args:
+    fw_versions_dict (dict): A dictionary containing firmware versions.
+    included_fw_versions (DefaultDict[Tuple[int, int, str]): Included firmware version lookup dictionary.
+    excluded_fw_versions (DefaultDict[Tuple[int, int, str]): Excluded firmware version lookup dictionary.
+
+  Returns:
+    tuple: Tuple containing match counts and candidates for included and excluded types."""
+  match_counts = [0, 0] # [included, excluded]
+  candidates = [str, str] # 
   for addr, versions in fw_versions_dict.items():
     for version in versions:
-      # All cars that have this FW response on the specified address
-      candidates = all_fw_versions[(addr[0], addr[1], version)]
+      key = (addr[0], addr[1], version)
+      for i, fw_v in enumerate([included_fw_versions, excluded_fw_versions]):
+        match_counts[i], candidates[i] = process_candidates(fw_v[key], match_counts[i], candidates[i])
+  return *match_counts, *candidates
 
-      if len(candidates) == 1:
-        match_count += 1
-        if candidate is None:
-          candidate = candidates[0]
-        # We uniquely matched two different cars. No fuzzy match possible
-        elif candidate != candidates[0]:
-          return set()
+def process_candidates(candidates: list, match_count: int, candidate: Type[str]) -> tuple:
+  """Process candidate matches and update the match count and candidate accordingly.
 
-  if match_count >= 2:
-    if log:
-      cloudlog.error(f"Fingerprinted {candidate} using fuzzy match. {match_count} matching ECUs")
-    return {candidate}
+  Args:
+    candidates (list): List of candidate car models.
+    match_count (int): Current match count.
+    candidate (Type[str]): Current candidate car model.
+
+  Returns:
+    tuple: Tuple containing the updated match count and candidate."""
+  if len(candidates) == 1:
+    match_count += 1
+    candidate = candidate or candidates[0]
+    if candidate != candidates[0]: 
+      return 0, None
+  return match_count, candidate
+
+def determine_match_result(included_match_count: int, excluded_match_count: int, included_candidate: str, excluded_candidate: str, log: bool) -> set:
+  """Determine the match result based on match counts and candidates.
+
+  Args:
+    included_match_count (int): Match count for included candidates.
+    excluded_match_count (int): Match count for excluded candidates.
+    included_candidate (str): Current included candidate car model.
+    excluded_candidate (str): Current excluded candidate car model.
+    log (bool): If True, print the fingerprinting result to term.
+    
+  Returns:
+    set: A set containing the matched car model, or an empty set if no match is found."""
+  if included_match_count >= 2:
+    if log: 
+      cloudlog.error(f"Fingerprinted {included_candidate} using fuzzy match. {included_match_count} matching ECUs")
+    return {included_candidate}
+  elif included_match_count == 1 and excluded_match_count >= 3 and included_candidate == excluded_candidate:
+    # If we have at least 3 excluded matches and only 1 included match and the included candidate is the same as the excluded candidate,
+    if log: 
+      cloudlog.error(f"Fingerprinted {excluded_candidate} using fuzzy match. {included_match_count} matching ECUs and {excluded_match_count} excluded matching ECUs")
+    return {excluded_candidate}
   else:
     return set()
 
