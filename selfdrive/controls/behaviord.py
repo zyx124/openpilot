@@ -4,9 +4,8 @@
 from common.params import Params
 import cereal.messaging as messaging
 import time
-from selfdrive.controls.lib.longitudinal_planner import A_CRUISE_MIN
 
-
+A_CRUISE_MIN = -1.2
 class LiveBehavior():
   def __init__(self):
     self.a_cruise_min = A_CRUISE_MIN
