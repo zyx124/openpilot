@@ -18,7 +18,7 @@ class CustomSlider : public QSlider {
 public:
   using CerealSetterFunction = std::function<void(cereal::Behavior::Builder&, double)>;
 
-  CustomSlider(const QString &param, CerealSetterFunction cerealSetFunc, 
+  CustomSlider(const std::string &param, CerealSetterFunction cerealSetFunc, 
                            const QString &unit, const QString &title, 
                            double paramMin, double paramMax, double defaultVal, QWidget *parent = nullptr);
 
@@ -45,10 +45,9 @@ protected:
 private:
   void initialize();
   
-
   double defaultVal;
   double scaleFactor;
-  QString param;
+  std::string param;
   QString title;
   QString unit;
 

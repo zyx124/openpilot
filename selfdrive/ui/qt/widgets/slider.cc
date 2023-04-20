@@ -3,7 +3,7 @@
 #include "selfdrive/ui/qt/offroad/settings.h"
 
 
-CustomSlider::CustomSlider(const QString &param, 
+CustomSlider::CustomSlider(const std::string &param, 
                            CerealSetterFunction cerealSetFunc, 
                            const QString &unit,
                            const QString &title, 
@@ -41,7 +41,7 @@ void CustomSlider::initialize()
   titleLayout->addWidget(resetButton, 0, Qt::AlignRight);
   // Connect the reset button to set the slider value to the default value
   connect(resetButton, &ButtonControl::clicked, [&]() {
-    if (ConfirmationDialog::confirm(tr("Are you sure you want to reset ") + param + "?", tr("Reset"), this)) {
+    if (ConfirmationDialog::confirm(tr("Are you sure you want to reset ") + QString::fromStdString(param) + "?", tr("Reset"), this)) {
       this->setValue(sliderMin + (defaultVal - paramMin) / (paramMax - paramMin) * (sliderRange));
     } 
   });
@@ -57,7 +57,7 @@ void CustomSlider::initialize()
 
   try // Try to get the value of the param from params. If it doesn't exist, catch the error
   {
-    QString valueStr = QString::fromStdString(Params().get(param.toStdString()));
+    QString valueStr = QString::fromStdString(Params().get(param));
     double value = QString(valueStr).toDouble();
     // Set the value of the param in the behavior struct
     MessageBuilder msg;
@@ -68,7 +68,7 @@ void CustomSlider::initialize()
     label->setText(title + " " + QString::number(value, 'f', 2) + " " + unit);
     
     // Set the slider to be enabled or disabled depending on the lock status
-    bool locked = Params().getBool((param + "Lock").toStdString());
+    bool locked = Params().getBool((param + "Lock"));
     setEnabled(!locked);
     setStyleSheet(locked ? lockedSliderStyle : SliderStyle);
     label->setStyleSheet(locked ? lockedLabelStyle : LabelStyle);

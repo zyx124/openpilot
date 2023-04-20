@@ -75,7 +75,7 @@ private:
 
 
 struct SliderDefinition {
-    QString paramName;
+    std::string paramName;
     QString title;
     QString unit;
     double paramMin;
@@ -97,7 +97,7 @@ private:
   std::unique_ptr<PubMaster> pm;
   Params params;
   std::map<std::string, QWidget *> sliderItems;
-  QMap<QString, CustomSlider *> sliders;
+  QMap<std::string, CustomSlider *> sliders;
   QTimer *timer;
 };
 

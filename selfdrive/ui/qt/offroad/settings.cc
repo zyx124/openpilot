@@ -341,12 +341,11 @@ BehaviorPanel::BehaviorPanel(SettingsWindow *parent) : ListWidget(parent){
   
   // Loop through the slider definitions and create sliders
   for (const auto &slider_def : slider_defs) {
-    QString param = slider_def.paramName;
     
     // Get the setter function from the map
     CustomSlider::CerealSetterFunction cerealSetFunc = slider_def.cerealSetFunc;
 
-    CustomSlider *slider = new CustomSlider(param, \
+    CustomSlider *slider = new CustomSlider(slider_def.paramName, \
                                             cerealSetFunc,  \
                                             slider_def.unit, \
                                             slider_def.title, \
@@ -354,8 +353,8 @@ BehaviorPanel::BehaviorPanel(SettingsWindow *parent) : ListWidget(parent){
                                             slider_def.paramMax,  \
                                             slider_def.defaultVal,  \
                                             this);
-    sliders[param] = slider; // Store the slider pointer in the map
-    sliderItems[param.toStdString()] = slider->getSliderItem(); // Store the slider item pointer in the map
+    sliders[slider_def.paramName] = slider; // Store the slider pointer in the map
+    sliderItems[slider_def.paramName] = slider->getSliderItem(); // Store the slider item pointer in the map
     addItem(slider->getSliderItem()); // Add the slider item to the list widget
 
   }
