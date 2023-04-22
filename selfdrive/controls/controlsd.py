@@ -29,6 +29,9 @@ from selfdrive.controls.lib.vehicle_model import VehicleModel
 from selfdrive.locationd.calibrationd import Calibration
 from system.hardware import HARDWARE
 from selfdrive.manager.process_config import managed_processes
+from selfdrive.controls.behaviord import LiveBehavior 
+
+lb = LiveBehavior()
 
 SOFT_DISABLE_TIME = 3  # seconds
 LDW_MIN_SPEED = 31 * CV.MPH_TO_MS
@@ -595,6 +598,13 @@ class Controls:
       self.LaC.reset()
     if not CC.longActive:
       self.LoC.reset(v_pid=CS.vEgo)
+      
+    # Update LiveBehavior params
+    self.CP.lateralTuning.torque.latAngleFactor = lb.get_live_param("LatAngleFactor")
+    self.CP.lateralTuning.torque.latAccelFactor = lb.get_live_param("LatAccelFactor")
+    self.CP.lateralTuning.torque.latAccelOffset = lb.get_live_param("LatAccelOffset")
+    self.CP.lateralTuning.torque.friction = lb.get_live_param("Friction")
+    self.CP.steerActuatorDelay = lb.get_live_param("SteerDelay")
 
     if not self.joystick_mode:
       # accel PID loop
@@ -603,6 +613,7 @@ class Controls:
       actuators.accel = self.LoC.update(CC.longActive, CS, long_plan, pid_accel_limits, t_since_plan)
 
       # Steering PID loop and lateral MPC
+      
       self.desired_curvature, self.desired_curvature_rate = get_lag_adjusted_curvature(self.CP, CS.vEgo,
                                                                                        lat_plan.psis,
                                                                                        lat_plan.curvatures,

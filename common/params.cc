@@ -84,8 +84,14 @@ private:
 };
 
 std::unordered_map<std::string, uint32_t> keys = {
+    {"BehaviorVersion", PERSISTENT},
     {"AccelCruiseMin", PERSISTENT},
     {"AccelCruiseMaxFactor", PERSISTENT},
+    {"LatAngleFactor", PERSISTENT},
+    {"LatAccelFactor", PERSISTENT},
+    {"LatAccelOffset", PERSISTENT},
+    {"Friction", PERSISTENT},
+    {"SteerDelay", PERSISTENT},
     {"AccessToken", CLEAR_ON_MANAGER_START | DONT_LOG},
     {"AssistNowToken", PERSISTENT},
     {"AthenadPid", PERSISTENT},

@@ -321,20 +321,43 @@ void DevicePanel::poweroff() {
 }
 
 BehaviorPanel::BehaviorPanel(SettingsWindow *parent) : ListWidget(parent){
-  
+
   // Add sliders here
   // name, label, units, min, max, default, setter function
   std::vector<SliderDefinition> slider_defs{
-    {
-      "AccelCruiseMin", tr("Minimum Cruise Accel:"), "m/s<sup>2</sup>", -3.0, 0.0, -1.2,
+    {"AccelCruiseMin", tr("Minimum Cruise Accel:"), "m/s<sup>2</sup>", -3.0, 0.0, -1.2,
       [](cereal::Behavior::Builder &behavior, double value) {
         behavior.setAccelCruiseMin(static_cast<float>(value));
       }
     },
-    {
-      "AccelCruiseMaxFactor", tr("Cruise Accel Factor:"), "Coef.", 0.0, 3, 1,
+    {"AccelCruiseMaxFactor", tr("Cruise Accel Factor:"), "Coef.", 0.0, 3.0, 1.0,
       [](cereal::Behavior::Builder &behavior, double value) {
         behavior.setAccelCruiseMaxFactor(static_cast<float>(value));
+      }
+    },
+    {"LatAngleFactor", tr("Steering Angle Factor:"), "Coef.", 0.0, 0.3, 0.14,
+      [](cereal::Behavior::Builder &behavior, double value) {
+        behavior.setLatAngleFactor(static_cast<float>(value));
+      }
+    },
+    {"LatAccelFactor", tr("Lateral Accel Factor:"), "Coef.", 0.0, 4.0, 1.0,
+      [](cereal::Behavior::Builder &behavior, double value) {
+        behavior.setLatAccelFactor(static_cast<float>(value));
+      }
+    },
+    {"LatAccelOffset", tr("Lateral Accel Offset:"), "Coef.", -0.2, 0.2, 0.0,
+      [](cereal::Behavior::Builder &behavior, double value) {
+        behavior.setLatAccelOffset(static_cast<float>(value));
+      }
+    },
+    {"Friction", tr("Friction:"), "Coef.", 0.0, 0.5, 0.2,
+      [](cereal::Behavior::Builder &behavior, double value) {
+        behavior.setFriction(static_cast<float>(value));
+      }
+    },
+    {"SteerDelay", tr("Steer Delay:"), "Sec.", 0.0, 0.5, 0.1,
+      [](cereal::Behavior::Builder &behavior, double value) {
+        behavior.setSteerDelay(static_cast<float>(value));
       }
     },
   };
@@ -454,7 +477,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QFrame(parent) {
   QObject::connect(map_panel, &MapPanel::closeSettings, this, &SettingsWindow::closeSettings);
 #endif
 
-  const int padding = panels.size() > 3 ? 25 : 35;
+  const int padding = panels.size() > 3 ? 15 : 35;
 
   nav_btns = new QButtonGroup(this);
   for (auto &[name, panel] : panels) {

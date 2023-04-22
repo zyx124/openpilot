@@ -27,7 +27,7 @@ _A_TOTAL_MAX_BP = [20., 40.]
 lb = LiveBehavior()
 
 def get_max_accel(v_ego):
-  return interp(v_ego, A_CRUISE_MAX_BP, np.array(A_CRUISE_MAX_VALS) * lb.get_live_a_cruise_max_factor())
+  return interp(v_ego, A_CRUISE_MAX_BP, np.array(A_CRUISE_MAX_VALS) * lb.get_live_param("AccelCruiseMaxFactor"))
 
 
 def limit_accel_in_turns(v_ego, angle_steers, a_target, CP):
@@ -94,7 +94,7 @@ class LongitudinalPlanner:
     prev_accel_constraint = not (reset_state or sm['carState'].standstill)
 
     if self.mpc.mode == 'acc':
-      accel_limits = [lb.get_live_a_cruise_min(), get_max_accel(v_ego)]
+      accel_limits = [lb.get_live_param("AccelCruiseMin"), get_max_accel(v_ego)]
       accel_limits_turns = limit_accel_in_turns(v_ego, sm['carState'].steeringAngleDeg, accel_limits, self.CP)
     else:
       accel_limits = [MIN_ACCEL, MAX_ACCEL]

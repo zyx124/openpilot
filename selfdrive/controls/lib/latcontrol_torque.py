@@ -5,6 +5,7 @@ from common.numpy_fast import interp
 from selfdrive.controls.lib.latcontrol import LatControl
 from selfdrive.controls.lib.pid import PIDController
 from selfdrive.controls.lib.vehicle_model import ACCELERATION_DUE_TO_GRAVITY
+from selfdrive.controls.behaviord import LiveBehavior
 
 # At higher speeds (25+mph) we can assume:
 # Lateral acceleration achieved by a specific car correlates to
@@ -19,7 +20,7 @@ from selfdrive.controls.lib.vehicle_model import ACCELERATION_DUE_TO_GRAVITY
 
 LOW_SPEED_X = [0, 10, 20, 30]
 LOW_SPEED_Y = [15, 13, 10, 5]
-
+lb = LiveBehavior()
 
 class LatControlTorque(LatControl):
   def __init__(self, CP, CI):
@@ -30,6 +31,7 @@ class LatControlTorque(LatControl):
     self.torque_from_lateral_accel = CI.torque_from_lateral_accel()
     self.use_steering_angle = self.torque_params.useSteeringAngle
     self.steering_angle_deadzone_deg = self.torque_params.steeringAngleDeadzoneDeg
+    
 
   def update_live_torque_params(self, latAccelFactor, latAccelOffset, friction):
     self.torque_params.latAccelFactor = latAccelFactor
@@ -38,7 +40,11 @@ class LatControlTorque(LatControl):
 
   def update(self, active, CS, VM, params, last_actuators, steer_limited, desired_curvature, desired_curvature_rate, llk):
     pid_log = log.ControlsState.LateralTorqueState.new_message()
-
+    #self.torque_params.latAngleFactor = lb.get_live_param("LatAngleFactor")
+    #self.torque_params.latAccelFactor = lb.get_live_param("LatAccelFactor")
+    #self.torque_params.latAccelOffset = lb.get_live_param("LatAccelOffset")
+    #self.torque_params.friction = lb.get_live_param("Friction")
+    
     if not active:
       output_torque = 0.0
       pid_log.active = False

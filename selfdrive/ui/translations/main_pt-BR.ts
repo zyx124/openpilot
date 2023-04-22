@@ -100,6 +100,26 @@
         <source>Cruise Accel Factor:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Steering Angle Factor:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lateral Accel Factor:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lateral Accel Offset:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Friction:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Steer Delay:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConfirmationDialog</name>

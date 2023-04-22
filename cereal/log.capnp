@@ -2087,8 +2087,14 @@ struct UserFlag {
 }
 
 struct Behavior {
-  accelCruiseMin @0 :Float32;
-  accelCruiseMaxFactor @1 :Float32;
+  version @0 :UInt32;
+  accelCruiseMin @1 :Float32;
+  accelCruiseMaxFactor @2 :Float32;
+  latAngleFactor @3 :Float32;
+  latAccelFactor @4 :Float32;
+  latAccelOffset @5 :Float32;
+  friction @6 :Float32;
+  steerDelay @7 :Float32;
 }
 
 struct Microphone {
