@@ -99,7 +99,7 @@ def match_fw_to_car_fuzzy(fw_versions_dict, log=True, exclude=None):
     if log:
       cloudlog.error(f"Fingerprinted {included_candidate} using fuzzy match. {included_match_count} matching ECUs")
     return {included_candidate}
-  elif included_match_count == 1 and excluded_match_count >= 3 and excluded_candidate == included_candidate:
+  elif included_match_count == 1 and excluded_match_count > 0 and excluded_candidate == included_candidate:
     if log:
       cloudlog.error(f"Fingerprinted {excluded_candidate} using fuzzy match. {included_match_count} matching ECUs and {excluded_match_count} excluded matching ECUs")
     return {excluded_candidate}
