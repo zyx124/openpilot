@@ -89,13 +89,7 @@ FW_QUERY_CONFIG = FwQueryConfig(
     Request(
       [StdQueries.MANUFACTURER_SOFTWARE_VERSION_REQUEST],
       [StdQueries.MANUFACTURER_SOFTWARE_VERSION_RESPONSE],
-    ),
-    Request( # from ford config
-      [StdQueries.TESTER_PRESENT_REQUEST, StdQueries.MANUFACTURER_SOFTWARE_VERSION_REQUEST], #  [b'>\x00', b'"\xf1\x88']
-      [StdQueries.TESTER_PRESENT_RESPONSE, StdQueries.MANUFACTURER_SOFTWARE_VERSION_RESPONSE],
-      bus=0,
-      whitelist_ecus=[Ecu.engine, Ecu.transmission],
-    ),
+    )
   ],
 )
 
@@ -378,9 +372,9 @@ FW_VERSIONS = {
       b'DFR5-3216X-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'BDGF-3216X-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
-    #(Ecu.engine, 0x7e0, None): [
-    #  b'PX06-188K2-S\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
-    #],
+    (Ecu.engine, 0x7e0, None): [
+      b'PX06-188K2-S\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
     (Ecu.fwdRadar, 0x764, None): [
       b'BDTS-67XK2-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'B0N2-67XK2-A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
@@ -393,20 +387,20 @@ FW_VERSIONS = {
       b'BDGF-67WK2-K\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'BDGF-67WK2-C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
-    #(Ecu.transmission, 0x7e1, None): [
-    #  b'PX01-21PS1-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
-    #],
+    (Ecu.transmission, 0x7e1, None): [
+      b'PX01-21PS1-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
   },
   
   CAR.CX_50 : {
     (Ecu.eps, 0x730, None): [
       b'VA40-3216Y-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
-    #(Ecu.engine, 0x7e0, None): [
-    #  b'PX06-188K2-N\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
-    #  b'PX08-188K2-L\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
-    #  b'PX4W-188K2-C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
-    #],
+    (Ecu.engine, 0x7e0, None): [
+      b'PX06-188K2-N\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'PX08-188K2-L\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'PX4W-188K2-C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
     (Ecu.fwdRadar, 0x764, None): [
       b'VA45-67XK2-\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
@@ -416,11 +410,11 @@ FW_VERSIONS = {
     (Ecu.fwdCamera, 0x706, None): [
       b'VA40-67WK2-\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
-    #(Ecu.transmission, 0x7e1, None): [
-    #  b'PX01-21PS1-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
-    #  b'PX03-21PS1-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
-    #  b'PX4K-21PS1-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
-    #],
+    (Ecu.transmission, 0x7e1, None): [
+      b'PX01-21PS1-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'PX03-21PS1-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'PX4K-21PS1-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+    ],
   },
 }
 
