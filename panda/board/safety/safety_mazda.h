@@ -93,7 +93,7 @@ static int mazda_rx_hook(CANPacket_t *to_push) {
       brake_pressed = (GET_BYTE(to_push, 0) & 0x10U);
     }
     if (addr == MAZDA_CRZ_EVENTS) {
-      bool cruise_engaged = GET_BYTE(to_push, 0) & 0x8U;
+      bool cruise_engaged = GET_BYTE(to_push, 2) & 0x1U;
       pcm_cruise_check(cruise_engaged);
     }
 
