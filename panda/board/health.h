@@ -22,4 +22,5 @@ struct __attribute__((packed)) health_t {
   uint8_t heartbeat_lost_pkt;
   uint16_t unsafe_mode_pkt;
   uint32_t blocked_msg_cnt_pkt;
+  uint8_t torque_interceptor_detected_pkt;
 };

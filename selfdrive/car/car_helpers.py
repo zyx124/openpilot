@@ -12,8 +12,12 @@ import cereal.messaging as messaging
 from selfdrive.car import gen_empty_fingerprint
 import selfdrive.sentry as sentry
 
+from selfdrive import global_ti
+
 from cereal import car
+from cereal import log
 EventName = car.CarEvent.EventName
+DynamicParam = log.PandaState
 
 
 def get_startup_event(car_recognized, controller_available, fw_seen):
@@ -172,6 +176,10 @@ def fingerprint(logcan, sendcan):
 
   cloudlog.event("fingerprinted", car_fingerprint=car_fingerprint,
                  source=source, fuzzy=not exact_match, fw_count=len(car_fw))
+
+  global_ti.saved_candidate = car_fingerprint
+  global_ti.saved_finger = finger
+
   return car_fingerprint, finger, vin, car_fw, source, exact_match
 
 def is_connected_to_internet(timeout=5):
@@ -196,7 +204,6 @@ def crash_log2(fingerprints, fw):
 
 def get_car(logcan, sendcan):
   candidate, fingerprints, vin, car_fw, source, exact_match = fingerprint(logcan, sendcan)
-
   if candidate is None:
     cloudlog.warning("car doesn't match any fingerprints: %r", fingerprints)
     candidate = "mock"
@@ -208,6 +215,7 @@ def get_car(logcan, sendcan):
 
   try:
     CarInterface, CarController, CarState = interfaces[candidate]
+    global_ti.saved_CarInterface = CarInterface
     car_params = CarInterface.get_params(candidate, fingerprints, car_fw)
     car_params.carVin = vin
     car_params.carFw = car_fw
@@ -233,3 +241,11 @@ def get_car(logcan, sendcan):
     put_nonblocking("dp_sr_custom", '9.99')
     put_nonblocking("dp_sr_stock", '9.99')
     return None, None
+
+def get_ti():
+  print("get_ti, entering get_params")
+  CarInterface = global_ti.saved_CarInterface
+  car_params = CarInterface.get_params(global_ti.saved_candidate, global_ti.saved_finger)
+
+  return car_params
+

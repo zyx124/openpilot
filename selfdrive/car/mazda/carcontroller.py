@@ -2,7 +2,7 @@ from cereal import car
 from opendbc.can.packer import CANPacker
 from selfdrive.car.mazda import mazdacan
 from selfdrive.car.mazda.values import CarControllerParams, Buttons
-from selfdrive.car import apply_std_steer_torque_limits
+from selfdrive.car import apply_std_steer_torque_limits, apply_ti_steer_torque_limits
 from common.dp_common import common_controller_ctrl
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
@@ -14,6 +14,7 @@ class CarController():
     self.blinker_end_frame = 0.
 
     self.apply_steer_last = 0
+    self.ti_apply_steer_last = 0
     self.packer = CANPacker(dbc_name)
     self.steer_rate_limited = False
     self.brake_counter = 0
@@ -22,14 +23,22 @@ class CarController():
     can_sends = []
 
     apply_steer = 0
+    ti_apply_steer = ti_new_steer = 0
     self.steer_rate_limited = False
 
     if c.active:
       # calculate steer and also set limits due to driver torque
+      if CS.CP.enableTorqueInterceptor:
+        if CS.ti_lkas_allowed:
+          ti_new_steer = int(round(c.actuators.steer * CarControllerParams.TI_STEER_MAX))
+          ti_apply_steer = apply_ti_steer_torque_limits(ti_new_steer, self.ti_apply_steer_last,
+                                                    CS.out.steeringTorque, CarControllerParams)
+
       new_steer = int(round(c.actuators.steer * CarControllerParams.STEER_MAX))
       apply_steer = apply_std_steer_torque_limits(new_steer, self.apply_steer_last,
-                                                  CS.out.steeringTorque, CarControllerParams)
-      self.steer_rate_limited = new_steer != apply_steer
+                                                    CS.out.steeringTorque, CarControllerParams)
+
+      self.steer_rate_limited = (ti_new_steer != ti_apply_steer) or (new_steer != apply_steer)
 
       if CS.out.standstill and frame % 5 == 0:
         # Mazda Stop and Go requires a RES button (or gas) press if the car stops more than 3 seconds
@@ -63,6 +72,7 @@ class CarController():
     self.last_blinker_on = blinker_on
 
     self.apply_steer_last = apply_steer
+    self.ti_apply_steer_last = ti_apply_steer
 
     # send HUD alerts
     if frame % 50 == 0:
@@ -73,6 +83,11 @@ class CarController():
       can_sends.append(mazdacan.create_alert_command(self.packer, CS.cam_laneinfo, ldw, steer_required))
 
     # send steering command
+
+    #The ti cannot be detected unless OP sends a can message to it becasue the ti only transmits when it 
+    #sees the signature key in the designated address range.
+    can_sends.append(mazdacan.create_ti_steering_control(self.packer, CS.CP.carFingerprint,ti_apply_steer))
+    # always send to the stock system
     can_sends.append(mazdacan.create_steering_control(self.packer, CS.CP.carFingerprint,
                                                       frame, apply_steer, CS.cam_lkas))
 
