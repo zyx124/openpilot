@@ -152,14 +152,18 @@ class CarInterface(CarInterfaceBase):
 
     self.cp.update_strings(can_strings)
     self.cp_cam.update_strings(can_strings)
+    self.cp_body.update_strings(can_strings)
     if self.CP.enableTorqueInterceptor and not TI.enabled:
       TI.enabled = True
       self.cp = self.CS.get_can_parser(self.CP)
-    ret = self.CS.update(self.cp, self.cp_cam)
+      self.cp_body = self.CS.get_body_can_parser(self.CP)
+      ret = self.CS.update(self.cp, self.cp_cam, self.cp_body)
+    ret = self.CS.update(self.cp, self.cp_cam, self.cp_body)
     # dp
     self.dragonconf = dragonconf
     ret.cruiseState.enabled = common_interface_atl(ret, dragonconf.dpAtl)
     ret.canValid = self.cp.can_valid and self.cp_cam.can_valid
+    ret.canValid = self.cp.can_valid and self.cp_cam.can_valid and (self.cp_body is None or self.cp_body.can_valid)
 
     # events
     events = self.create_common_events(ret)

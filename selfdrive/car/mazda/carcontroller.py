@@ -38,7 +38,7 @@ class CarController():
       apply_steer = apply_std_steer_torque_limits(new_steer, self.apply_steer_last,
                                                     CS.out.steeringTorque, CarControllerParams)
 
-      self.steer_rate_limited = (ti_new_steer != ti_apply_steer) or (new_steer != apply_steer)
+      self.steer_rate_limited = (new_steer != apply_steer) and (ti_new_steer != ti_apply_steer)
 
       if CS.out.standstill and frame % 5 == 0:
         # Mazda Stop and Go requires a RES button (or gas) press if the car stops more than 3 seconds
@@ -86,7 +86,7 @@ class CarController():
 
     #The ti cannot be detected unless OP sends a can message to it becasue the ti only transmits when it 
     #sees the signature key in the designated address range.
-    can_sends.append(mazdacan.create_ti_steering_control(self.packer, CS.CP.carFingerprint,ti_apply_steer))
+    can_sends.extend(mazdacan.create_ti_steering_control(self.packer, CS.CP.carFingerprint, frame, ti_apply_steer))
     # always send to the stock system
     can_sends.append(mazdacan.create_steering_control(self.packer, CS.CP.carFingerprint,
                                                       frame, apply_steer, CS.cam_lkas))
