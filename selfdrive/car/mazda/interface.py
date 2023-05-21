@@ -6,6 +6,7 @@ from selfdrive.car import STD_CARGO_KG, scale_tire_stiffness, get_safety_config
 from selfdrive.controls.lib.drive_helpers import get_friction
 from selfdrive.car.interfaces import CarInterfaceBase, FRICTION_THRESHOLD
 from typing import Callable
+from selfdrive.global_ti import TI
 
 ButtonType = car.CarState.ButtonEvent.Type
 EventName = car.CarEvent.EventName
@@ -47,8 +48,7 @@ class CarInterface(CarInterfaceBase):
       ret.startingState = True
       
     ret.radarUnavailable = True
-
-    ret.dashcamOnly = candidate not in (CAR.CX5_2022, CAR.CX9_2021, CAR.MAZDA3_2019, CAR.CX_30, CAR.CX_50, CAR.CX_60, CAR.CX_70, CAR.CX_80, CAR.CX_90)
+    ret.dashcamOnly = False
 
     ret.steerActuatorDelay = 0.1
     ret.steerLimitTimer = 0.8
@@ -105,6 +105,12 @@ class CarInterface(CarInterfaceBase):
 
   # returns a car.CarState
   def _update(self, c):
+    
+    if self.CP.enableTorqueInterceptor and not TI.enabled:
+      TI.enabled = True
+      self.cp_body = self.CS.get_body_can_parser(self.CP)
+      self.can_parsers = [self.cp, self.cp_cam, self.cp_adas, self.cp_body, self.cp_loopback]
+
     ret = self.CS.update(self.cp, self.cp_cam, self.cp_body)
 
     # events
@@ -114,6 +120,9 @@ class CarInterface(CarInterfaceBase):
       events.add(EventName.lkasDisabled)
     elif self.CS.low_speed_alert:
       events.add(EventName.belowSteerSpeed)
+
+    if not self.CS.acc_active_last and not self.CS.ti_lkas_allowed:
+      events.add(EventName.steerTempUnavailable)
 
     ret.events = events.to_msg()
 

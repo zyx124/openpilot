@@ -8,19 +8,26 @@ from selfdrive.car.fw_query_definitions import FwQueryConfig, Request, StdQuerie
 
 Ecu = car.CarParams.Ecu
 
-
 # Steer torque limits
 class CarControllerParams:
   def __init__(self, CP):
     self.STEER_STEP = 1 # 100 Hz
     if CP.carFingerprint in GEN1:
-      self.STEER_MAX = 800                # theoretical max_steer 2047
-      self.STEER_DELTA_UP = 10             # torque increase per refresh
-      self.STEER_DELTA_DOWN = 25           # torque decrease per refresh
-      self.STEER_DRIVER_ALLOWANCE = 15     # allowed driver torque before start limiting
+      self.STEER_MAX = 600                # theoretical max_steer 2047
+      self.STEER_DELTA_UP = 6             # torque increase per refresh
+      self.STEER_DELTA_DOWN = 15           # torque decrease per refresh
+      self.STEER_DRIVER_ALLOWANCE = 5     # allowed driver torque before start limiting
       self.STEER_DRIVER_MULTIPLIER = 1     # weight driver torque
       self.STEER_DRIVER_FACTOR = 1         # from dbc
       self.STEER_ERROR_MAX = 350           # max delta between torque cmd and torque motor
+      self.TI_STEER_MAX = 600                # theoretical max_steer 2047
+      self.TI_STEER_DELTA_UP = 6             # torque increase per refresh
+      self.TI_STEER_DELTA_DOWN = 15           # torque decrease per refresh
+      self.TI_STEER_DRIVER_ALLOWANCE = 5    # allowed driver torque before start limiting
+      self.TI_STEER_DRIVER_MULTIPLIER = 40     # weight driver torque
+      self.TI_STEER_DRIVER_FACTOR = 1         # from dbc
+      self.TI_STEER_ERROR_MAX = 350           # max delta between torque cmd and torque motor
+      
     if CP.carFingerprint in GEN2:
       self.STEER_MAX = 8000                 
       self.STEER_DELTA_UP = 45              # torque increase per refresh
@@ -28,7 +35,14 @@ class CarControllerParams:
       self.STEER_DRIVER_ALLOWANCE = 1400     # allowed driver torque before start limiting
       self.STEER_DRIVER_MULTIPLIER = 5      # weight driver torque
       self.STEER_DRIVER_FACTOR = 1           # from dbc
-      self.STEER_ERROR_MAX = 3500            # max delta between torque cmd and torque motor
+      self.STEER_ERROR_MAX = 3500            # max delta between torque cmd and torque moto
+
+
+class TI_STATE:
+  DISCOVER = 0
+  OFF = 1
+  DRIVER_OVER = 2
+  RUN = 3
 
 class CAR:
   CX5 = "MAZDA CX-5"
@@ -71,8 +85,12 @@ CAR_INFO: Dict[str, Union[MazdaCarInfo, List[MazdaCarInfo]]] = {
 
 class LKAS_LIMITS:
   STEER_THRESHOLD = 15
-  DISABLE_SPEED = 45    # kph
-  ENABLE_SPEED = 52     # kph
+  DISABLE_SPEED = 0    # kph
+  ENABLE_SPEED = 0     # kph
+  TI_STEER_THRESHOLD = 15
+  TI_DISABLE_SPEED = 0    # kph
+  TI_ENABLE_SPEED = 0     # kph
+
 
 
 class Buttons:
@@ -81,7 +99,7 @@ class Buttons:
   SET_MINUS = 2
   RESUME = 3
   CANCEL = 4
-
+  TURN_ON = 5
 
 FW_QUERY_CONFIG = FwQueryConfig(
   requests=[

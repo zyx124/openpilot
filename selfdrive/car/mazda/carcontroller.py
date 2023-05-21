@@ -1,6 +1,6 @@
 from cereal import car
 from opendbc.can.packer import CANPacker
-from selfdrive.car import apply_driver_steer_torque_limits
+from selfdrive.car import apply_driver_steer_torque_limits, apply_ti_steer_torque_limits
 from selfdrive.car.mazda import mazdacan
 from selfdrive.car.mazda.values import CarControllerParams, Buttons, GEN1
 from common.realtime import ControlsTimer as Timer
@@ -25,13 +25,21 @@ class CarController:
     can_sends = []
 
     apply_steer = 0
+    ti_apply_steer = 0
     
     if CC.latActive:
       # calculate steer and also set limits due to driver torque
       new_steer = int(round(CC.actuators.steer * self.params.STEER_MAX))
       apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last,
                                                   CS.out.steeringTorque, self.params)
+      
+      if CS.CP.enableTorqueInterceptor and CS.ti_lkas_allowed:
+        ti_new_steer = int(round(CC.actuators.steer * CarControllerParams.TI_STEER_MAX))
+        ti_apply_steer = apply_ti_steer_torque_limits(ti_new_steer, self.ti_apply_steer_last,
+                                              CS.out.steeringTorque, CarControllerParams)
+    
     self.apply_steer_last = apply_steer
+    self.ti_apply_steer_last = ti_apply_steer
     
     if self.CP.carFingerprint in GEN1:
       if CC.cruiseControl.cancel:
@@ -58,7 +66,12 @@ class CarController:
         # TODO: find a way to silence audible warnings so we can add more hud alerts
         steer_required = steer_required and CS.lkas_allowed_speed
         can_sends.append(mazdacan.create_alert_command(self.packer, CS.cam_laneinfo, ldw, steer_required))
-    
+
+      #The ti cannot be detected unless OP sends a can message to it because the ti only tran
+      #sees the signature key in the designated address range.
+      can_sends.append(mazdacan.create_ti_steering_control(self.packer, self.CP.carFingerprint,
+                                                  self.frame, ti_apply_steer))
+
     else: # gen2
       resume = False
       hold = False
