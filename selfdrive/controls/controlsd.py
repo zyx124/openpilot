@@ -328,6 +328,9 @@ class Controls:
         self.CP.enableTorqueInterceptor = True
         #Update CP based on torque_interceptor_ready
         self.CP = get_ti()
+        # set alternative experiences since get_ti() reset it to default.
+        if not self.disengage_on_accelerator:
+          self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS
 
     # Handle HW and system malfunctions
     # Order is very intentional here. Be careful when modifying this.
