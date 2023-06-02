@@ -260,9 +260,8 @@ static int mazda_2019_tx_hook(CANPacket_t *to_send) {
   return tx;
 }
 
-static int mazda_2019_fwd_hook(int bus, CANPacket_t *to_fwd) {
+static int mazda_2019_fwd_hook(int bus, int addr) {
   int bus_fwd = -1;
-  int addr = GET_ADDR(to_fwd);
   bool block = false;
   
   if (bus == MAZDA_MAIN) {
