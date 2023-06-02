@@ -71,10 +71,10 @@ static int mazda_rx_hook(CANPacket_t *to_push) {
     }
 
     // enter controls on rising edge of ACC, exit controls on ACC off
-    if (addr == MAZDA_CRZ_EVENTS) {
-      bool cruise_engaged = GET_BYTE(to_push, 2) & 0x80U;
-      pcm_cruise_check(cruise_engaged);
-    }
+    //if (addr == MAZDA_CRZ_EVENTS) {
+      //bool cruise_engaged = GET_BYTE(to_push, 2) & 0x80U;
+      //pcm_cruise_check(cruise_engaged);
+    //}
 
     if (addr == MAZDA_ENGINE_DATA) {
       gas_pressed = (GET_BYTE(to_push, 4) || (GET_BYTE(to_push, 5) & 0xF0U));
@@ -82,6 +82,8 @@ static int mazda_rx_hook(CANPacket_t *to_push) {
 
     if (addr == MAZDA_PEDALS) {
       brake_pressed = (GET_BYTE(to_push, 0) & 0x10U);
+      bool cruise_engaged = GET_BYTE(to_push, 0) & 0x8U;
+      pcm_cruise_check(cruise_engaged);
     }
 
     generic_rx_checks((addr == MAZDA_LKAS));
