@@ -76,7 +76,7 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 3000 * CV.LB_TO_KG + STD_CARGO_KG
       ret.wheelbase = 2.725
       ret.steerRatio = 17.0
-      ret.steerActuatorDelay = 0.3
+      ret.steerActuatorDelay = 0.1
       ret.lateralTuning.torque.latAngleFactor = .13
     elif candidate in (CAR.CX_30, CAR.CX_50):
       ret.mass = 3375 * CV.LB_TO_KG + STD_CARGO_KG
