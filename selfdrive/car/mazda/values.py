@@ -8,15 +8,13 @@ from selfdrive.car.fw_query_definitions import FwQueryConfig, Request, StdQuerie
 
 Ecu = car.CarParams.Ecu
 
-
 # Steer torque limits
-
 class CarControllerParams:
-  STEER_MAX = 800                # theoretical max_steer 2047
+  STEER_MAX = 600                # theoretical max_steer 2047
   STEER_DELTA_UP = 10             # torque increase per refresh
   STEER_DELTA_DOWN = 25           # torque decrease per refresh
-  STEER_DRIVER_ALLOWANCE = 15     # allowed driver torque before start limiting
-  STEER_DRIVER_MULTIPLIER = 1     # weight driver torque
+  STEER_DRIVER_ALLOWANCE = 5    # allowed driver torque before start limiting
+  STEER_DRIVER_MULTIPLIER = 40     # weight driver torque
   STEER_DRIVER_FACTOR = 1         # from dbc
   STEER_ERROR_MAX = 350           # max delta between torque cmd and torque motor
   STEER_STEP = 1  # 100 Hz
@@ -24,6 +22,20 @@ class CarControllerParams:
   def __init__(self, CP):
     pass
 
+  TI_STEER_MAX = 600                # theoretical max_steer 2047
+  TI_STEER_DELTA_UP = 6             # torque increase per refresh
+  TI_STEER_DELTA_DOWN = 15           # torque decrease per refresh
+  TI_STEER_DRIVER_ALLOWANCE = 5    # allowed driver torque before start limiting
+  TI_STEER_DRIVER_MULTIPLIER = 40     # weight driver torque
+  TI_STEER_DRIVER_FACTOR = 1         # from dbc
+  TI_STEER_ERROR_MAX = 350           # max delta between torque cmd and torque motor
+
+
+class TI_STATE:
+  DISCOVER = 0
+  OFF = 1
+  DRIVER_OVER = 2
+  RUN = 3
 
 class CAR:
   CX5 = "MAZDA CX-5"
@@ -52,8 +64,12 @@ CAR_INFO: Dict[str, Union[MazdaCarInfo, List[MazdaCarInfo]]] = {
 
 class LKAS_LIMITS:
   STEER_THRESHOLD = 15
-  DISABLE_SPEED = 45    # kph
-  ENABLE_SPEED = 52     # kph
+  DISABLE_SPEED = 0    # kph
+  ENABLE_SPEED = 0     # kph
+  TI_STEER_THRESHOLD = 15
+  TI_DISABLE_SPEED = 0    # kph
+  TI_ENABLE_SPEED = 0     # kph
+
 
 
 class Buttons:
@@ -62,7 +78,7 @@ class Buttons:
   SET_MINUS = 2
   RESUME = 3
   CANCEL = 4
-
+  TURN_ON = 5
 
 FW_QUERY_CONFIG = FwQueryConfig(
   requests=[
@@ -259,31 +275,37 @@ FW_VERSIONS = {
       b'GBEF-3210X-B-00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'GBEF-3210X-C-00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'GFBC-3210X-A-00\000\000\000\000\000\000\000\000\000',
+      b'GFBC-3210X-A-00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.engine, 0x7e0, None): [
       b'PA34-188K2-A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'PX4F-188K2-D\000\000\000\000\000\000\000\000\000\000\000\000',
       b'PYH7-188K2-C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'PYH7-188K2-E\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'PANX-188K2-A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.fwdRadar, 0x764, None): [
       b'K131-67XK2-A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'K131-67XK2-E\000\000\000\000\000\000\000\000\000\000\000\000',
+      b'K131-67XK2-F\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.abs, 0x760, None): [
       b'GBVH-437K2-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'GBVH-437K2-C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'GDDM-437K2-A\000\000\000\000\000\000\000\000\000\000\000\000',
+      b'GDDM-437K2-A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.fwdCamera, 0x706, None): [
       b'B61L-67XK2-S\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'B61L-67XK2-T\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'GSH7-67XK2-P\000\000\000\000\000\000\000\000\000\000\000\000',
+      b'GSH7-67XK2-T\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.transmission, 0x7e1, None): [
       b'PA28-21PS1-A\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
       b'PYH3-21PS1-D\000\000\000\000\000\000\000\000\000\000\000\000',
       b'PYH7-21PS1-B\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
+      b'PA28-21PS1-C\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00',
     ],
   },
 
