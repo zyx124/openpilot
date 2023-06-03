@@ -133,7 +133,8 @@ class CarInterfaceBase(ABC):
     return self.get_steer_feedforward_default
 
   def torque_from_lateral_accel_linear(self, lateral_accel_value: float, torque_params: car.CarParams.LateralTorqueTuning,
-                                       lateral_accel_error: float, lateral_accel_deadzone: float, friction_compensation: bool) -> float:
+                                       lateral_accel_error: float, lateral_accel_deadzone: float,
+                                       steering_angle: float, vego: float, friction_compensation: bool) -> float:
     # The default is a linear relationship between torque and lateral acceleration (accounting for road roll and steering friction)
     friction = get_friction(lateral_accel_error, lateral_accel_deadzone, FRICTION_THRESHOLD, torque_params, friction_compensation)
     return (lateral_accel_value / float(torque_params.latAccelFactor)) + friction
