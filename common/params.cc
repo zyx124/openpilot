@@ -179,6 +179,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"OpenpilotEnabledToggle", PERSISTENT},
     {"PandaHeartbeatLost", CLEAR_ON_MANAGER_START | CLEAR_ON_OFFROAD_TRANSITION},
     {"PandaLogState", PERSISTENT},
+    {"OpenpilotLongitudinalControl", PERSISTENT},
     {"PandaSignatures", CLEAR_ON_MANAGER_START},
     {"Passive", PERSISTENT},
     {"PrimeType", PERSISTENT},
