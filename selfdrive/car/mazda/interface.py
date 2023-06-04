@@ -1,28 +1,56 @@
 #!/usr/bin/env python3
 from cereal import car
 from common.conversions import Conversions as CV
-from selfdrive.car.mazda.values import CAR, LKAS_LIMITS
+from selfdrive.car.mazda.values import CAR, LKAS_LIMITS, GEN2, GEN1
 from selfdrive.car import STD_CARGO_KG, scale_tire_stiffness, get_safety_config
-from selfdrive.car.interfaces import CarInterfaceBase
 from selfdrive.global_ti import TI
+from selfdrive.controls.lib.drive_helpers import get_friction
+from selfdrive.car.interfaces import CarInterfaceBase, FRICTION_THRESHOLD
+from typing import Callable
 
 ButtonType = car.CarState.ButtonEvent.Type
 EventName = car.CarEvent.EventName
+TorqueFromLateralAccelCallbackType = Callable[[float, car.CarParams.LateralTorqueTuning, float, float, float, float, bool], float]
 
 class CarInterface(CarInterfaceBase):
+  
+  @staticmethod
+  def torque_from_lateral_accel_mazda(lateral_accel_value: float, torque_params: car.CarParams.LateralTorqueTuning,
+                                           lateral_accel_error: float, lateral_accel_deadzone: float,
+                                           steering_angle: float, vego: float, friction_compensation: bool) -> float:
+    steering_angle = abs(steering_angle)
+    lat_factor = torque_params.latAccelFactor * ((steering_angle * torque_params.latAngleFactor) + 1)
+    
+    friction = get_friction(lateral_accel_error, lateral_accel_deadzone, FRICTION_THRESHOLD, torque_params, friction_compensation)
+    return (lateral_accel_value / lat_factor) + friction
+
+  def torque_from_lateral_accel(self) -> TorqueFromLateralAccelCallbackType:
+    if self.CP.carFingerprint in GEN2:
+      return self.torque_from_lateral_accel_mazda
+    else:
+      return self.torque_from_lateral_accel_linear
 
   @staticmethod
   def _get_params(ret, candidate, fingerprint, car_fw, experimental_long, docs):
     ret.carName = "mazda"
 
-    ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda)]
+    if candidate in GEN1:
+      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda)]
+      
+    if candidate in GEN2:
+      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda2019)]
+      ret.openpilotLongitudinalControl = True
+      ret.stopAccel = -.5
+      ret.vEgoStarting = .2
+      ret.longitudinalTuning.kpBP = [0., 5., 35.]
+      ret.longitudinalTuning.kpV = [0.0, 0.0, 0.0]
+      ret.longitudinalTuning.kiBP = [0., 35.]
+      ret.longitudinalTuning.kiV = [0.1, 0.1]
+      ret.startingState = True
+      
     ret.radarUnavailable = True
 
-    ret.dashcamOnly = False # candidate not in (CAR.CX5_2022, CAR.CX9_2021)
-
-    #ret.enableTorqueInterceptor = 0x24A in fingerprint[0]
-    #if ret.enableTorqueInterceptor:
-    #  print("Receiving torque interceptor signal.")
+    ret.dashcamOnly = False #candidate not in (CAR.CX5_2022, CAR.CX9_2021, CAR.MAZDA3_2019, CAR.CX_30, CAR.CX_50, CAR.CX_60, CAR.CX_70, CAR.CX_80, CAR.CX_90)
 
     ret.steerActuatorDelay = 0.1
     ret.steerLimitTimer = 0.8
@@ -46,8 +74,26 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 3443 * CV.LB_TO_KG + STD_CARGO_KG
       ret.wheelbase = 2.83
       ret.steerRatio = 15.5
+    elif candidate in CAR.MAZDA3_2019:
+      ret.mass = 3000 * CV.LB_TO_KG + STD_CARGO_KG
+      ret.wheelbase = 2.725
+      ret.steerRatio = 17.0
+      ret.steerActuatorDelay = 0.3
+      ret.lateralTuning.torque.latAngleFactor = .14
+    elif candidate in (CAR.CX_30, CAR.CX_50):
+      ret.mass = 3375 * CV.LB_TO_KG + STD_CARGO_KG
+      ret.wheelbase = 2.7
+      ret.steerRatio = 15.5
+      ret.steerActuatorDelay = 0.3
+      ret.lateralTuning.torque.latAngleFactor = .14
+    elif candidate in (CAR.CX_60, CAR.CX_80, CAR.CX_70, CAR.CX_90):
+      ret.mass = 4217 * CV.LB_TO_KG + STD_CARGO_KG
+      ret.wheelbase = 3.1
+      ret.steerRatio = 17.6
+      ret.steerActuatorDelay = 0.3
+      ret.lateralTuning.torque.latAngleFactor = .14
 
-    if candidate not in (CAR.CX5_2022, ):
+    if candidate not in (CAR.CX5_2022, CAR.MAZDA3_2019, CAR.CX_30, CAR.CX_50, CAR.CX_60, CAR.CX_70, CAR.CX_80, CAR.CX_90):
       ret.minSteerSpeed = LKAS_LIMITS.DISABLE_SPEED * CV.KPH_TO_MS
 
     ret.centerToFront = ret.wheelbase * 0.41
