@@ -50,20 +50,19 @@ def create_steering_control(packer, car_fingerprint, frame, apply_steer, lkas):
     
     bus = 0
     sig_name = "CAM_LKAS"
-    
-    if car_fingerprint in GEN1:
-      values = {
-        "LKAS_REQUEST": apply_steer,
-        "CTR": ctr,
-        "ERR_BIT_1": er1,
-        "LINE_NOT_VISIBLE" : lnv,
-        "LDW": ldw,
-        "BIT_1": b1,
-        "ERR_BIT_2": er2,
-        "STEERING_ANGLE": steering_angle,
-        "ANGLE_ENABLED": b2,
-        "CHKSUM": csum
-      }
+
+    values = {
+      "LKAS_REQUEST": apply_steer,
+      "CTR": ctr,
+      "ERR_BIT_1": er1,
+      "LINE_NOT_VISIBLE" : lnv,
+      "LDW": ldw,
+      "BIT_1": b1,
+      "ERR_BIT_2": er2,
+      "STEERING_ANGLE": steering_angle,
+      "ANGLE_ENABLED": b2,
+      "CHKSUM": csum
+    }
       
   elif car_fingerprint in GEN2:
     bus = 1
