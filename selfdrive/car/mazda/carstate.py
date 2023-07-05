@@ -95,8 +95,8 @@ class CarState(CarStateBase):
 
     # TODO: the signal used for available seems to be the adaptive cruise signal, instead of the main on
     #       it should be used for carState.cruiseState.nonAdaptive instead
-    ret.cruiseState.available = cp.vl["CRZ_CTRL"]["CRZ_AVAILABLE"] == 1
-    ret.cruiseState.enabled = cp.vl["CRZ_CTRL"]["CRZ_ACTIVE"] == 1
+    ret.cruiseState.available = True
+    ret.cruiseState.enabled = cp.vl["PEDALS"]["ACC_ACTIVE"] == 1
     ret.cruiseState.speed = cp.vl["CRZ_EVENTS"]["CRZ_SPEED"] * CV.KPH_TO_MS
 
     # On if no driver torque the last 5 seconds
@@ -146,11 +146,12 @@ class CarState(CarStateBase):
         ("LKAS_BLOCK", "STEER_RATE"),
         ("LKAS_TRACK_STATE", "STEER_RATE"),
         ("HANDS_OFF_5_SECONDS", "STEER_RATE"),
-        ("CRZ_ACTIVE", "CRZ_CTRL"),
-        ("CRZ_AVAILABLE", "CRZ_CTRL"),
+        #("CRZ_ACTIVE", "CRZ_CTRL"),
+        #("CRZ_AVAILABLE", "CRZ_CTRL"),
         ("CRZ_SPEED", "CRZ_EVENTS"),
         ("STANDSTILL", "PEDALS"),
         ("BRAKE_ON", "PEDALS"),
+        ("ACC_ACTIVE", "PEDALS"),
         ("BRAKE_PRESSURE", "BRAKE"),
         ("GEAR", "GEAR"),
         ("DRIVER_SEATBELT", "SEATBELT"),

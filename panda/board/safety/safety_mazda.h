@@ -29,7 +29,6 @@
 const CanMsg MAZDA_TX_MSGS[] = {{MAZDA_LKAS, 0, 8}, {MAZDA_CRZ_BTNS, 0, 8}, {MAZDA_LKAS2, 1, 8}, {MAZDA_LKAS_HUD, 0, 8}};
 
 AddrCheckStruct mazda_addr_checks[] = {
-  {.msg = {{MAZDA_CRZ_CTRL,     0, 8, .expected_timestep = 20000U}, { 0 }, { 0 }}},
   {.msg = {{MAZDA_CRZ_BTNS,     0, 8, .expected_timestep = 100000U}, { 0 }, { 0 }}},
   {.msg = {{MAZDA_STEER_TORQUE, 0, 8, .expected_timestep = 12000U}, { 0 }, { 0 }}},
   {.msg = {{MAZDA_ENGINE_DATA,  0, 8, .expected_timestep = 10000U}, { 0 }, { 0 }}},
@@ -72,7 +71,24 @@ static int mazda_rx_hook(CANPacket_t *to_push) {
     }
 
     // enter controls on rising edge of ACC, exit controls on ACC off
-    if (addr == MAZDA_CRZ_CTRL) {
+    //if (addr == MAZDA_CRZ_CTRL) {
+      //bool cruise_engaged = GET_BYTE(to_push, 0) & 0x8U;
+      //if (cruise_engaged) {
+        //if (!cruise_engaged_prev) {
+          //controls_allowed = 1;
+        //}
+      //} else {
+        //controls_allowed = 0;
+      //}
+      //cruise_engaged_prev = cruise_engaged;
+   // }
+
+    if (addr == MAZDA_ENGINE_DATA) {
+      gas_pressed = (GET_BYTE(to_push, 4) || (GET_BYTE(to_push, 5) & 0xF0U));
+    }
+
+    if (addr == MAZDA_PEDALS) {
+      brake_pressed = (GET_BYTE(to_push, 0) & 0x10U);
       bool cruise_engaged = GET_BYTE(to_push, 0) & 0x8U;
       if (cruise_engaged) {
         if (!cruise_engaged_prev) {
@@ -82,14 +98,6 @@ static int mazda_rx_hook(CANPacket_t *to_push) {
         controls_allowed = 0;
       }
       cruise_engaged_prev = cruise_engaged;
-    }
-
-    if (addr == MAZDA_ENGINE_DATA) {
-      gas_pressed = (GET_BYTE(to_push, 4) || (GET_BYTE(to_push, 5) & 0xF0U));
-    }
-
-    if (addr == MAZDA_PEDALS) {
-      brake_pressed = (GET_BYTE(to_push, 0) & 0x10U);
     }
 
     generic_rx_checks((addr == MAZDA_LKAS));
