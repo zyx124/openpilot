@@ -73,8 +73,11 @@ class CarController:
       # send steering command if GEN1
       #The ti cannot be detected unless OP sends a can message to it because the ti only transmits when it 
       #sees the signature key in the designated address range.
-      can_sends.append(mazdacan.create_ti_steering_control(self.packer, self.CP.carFingerprint,
-                                                        self.frame, ti_apply_steer))
+      if self.frame % 2 == 0:
+        can_sends.append(mazdacan.create_ti_steering_control(self.packer, self.CP.carFingerprint,
+                                                          self.frame, ti_apply_steer))
+        can_sends.append(mazdacan.create_steering_control(self.packer, self.CP.carFingerprint,
+                                                        self.frame, apply_steer, CS.cam_lkas))
     else:
       resume = False
       hold = False
@@ -100,8 +103,7 @@ class CarController:
         resume = self.resume_timer.active() # stay on for 0.5s to release the brake. This allows the car to move.
         can_sends.append(mazdacan.create_acc_cmd(self, self.packer, CS, CC, hold, resume))
 
-    # always send to the stock system
-    can_sends.append(mazdacan.create_steering_control(self.packer, self.CP.carFingerprint,
+      can_sends.append(mazdacan.create_steering_control(self.packer, self.CP.carFingerprint,
                                                       self.frame, apply_steer, CS.cam_lkas))
 
     new_actuators = CC.actuators.copy()
