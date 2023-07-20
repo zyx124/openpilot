@@ -106,12 +106,9 @@ class Buttons:
 
 FW_QUERY_CONFIG = FwQueryConfig(
   requests=[
-    # Log responses on powertrain bus
     Request(
       [StdQueries.MANUFACTURER_SOFTWARE_VERSION_REQUEST],
       [StdQueries.MANUFACTURER_SOFTWARE_VERSION_RESPONSE],
-      bus=0,
-      logging=True,
     ),
     Request(
       [StdQueries.TESTER_PRESENT_REQUEST, StdQueries.MANUFACTURER_SOFTWARE_VERSION_REQUEST],
