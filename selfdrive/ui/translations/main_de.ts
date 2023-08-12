@@ -1136,6 +1136,10 @@ This may take up to a minute.</source>
         <source>Enable the openpilot longitudinal control (alpha) toggle to allow Experimental mode.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Override Stock ACC</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Updater</name>
