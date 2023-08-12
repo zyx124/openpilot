@@ -28,7 +28,7 @@ class CarState(CarStateBase):
     self.ti_violation = 0
     self.ti_error = 0
     self.ti_lkas_allowed = False
-    
+    self.update = self.update_gen1
     if CP.carFingerprint in GEN1:
       self.update = self.update_gen1
     if CP.carFingerprint in GEN2:
@@ -208,7 +208,7 @@ class CarState(CarStateBase):
 
     if CP.carFingerprint in GEN1:
       # get real driver torque if we are using a torque interceptor
-      messages = CarState.get_ti_messages(CP)
+      messages += CarState.get_ti_messages(CP)
       messages += [
         ("ENGINE_DATA", 100),
         ("CRZ_CTRL", 50),
