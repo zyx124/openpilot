@@ -238,8 +238,7 @@ class Controls:
     # show alert to indicate whether NNFF is loaded
     if not self.nn_alert_shown and self.sm.frame % 1000 == 0 and self.CP.lateralTuning.which() == 'torque':
       self.nn_alert_shown = True
-      if self.LaC.use_nn:
-        self.events.add(EventName.torqueNNLoad)
+      self.events.add(EventName.torqueNNLoad)
 
     # Block resume if cruise never previously enabled
     resume_pressed = any(be.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for be in CS.buttonEvents)
