@@ -240,8 +240,6 @@ class Controls:
       self.nn_alert_shown = True
       if self.LaC.use_nn:
         self.events.add(EventName.torqueNNLoad)
-      else: 
-        self.events.add(EventName.torqueNNNotLoaded)
 
     # Block resume if cruise never previously enabled
     resume_pressed = any(be.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for be in CS.buttonEvents)
