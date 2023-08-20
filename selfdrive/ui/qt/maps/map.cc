@@ -69,6 +69,50 @@ void MapWindow::initLayers() {
     m_map->setPaintProperty("modelPathLayer", "line-width", 5.0);
     m_map->setLayoutProperty("modelPathLayer", "line-cap", "round");
   }
+  if (!m_map->layerExists("buildingsLayer")) {
+    qWarning() << "Initializing buildingsLayer";
+    
+    QVariantMap buildings;
+    buildings["id"] = "buildingsLayer";
+    buildings["source"] = "composite";
+    buildings["source-layer"] = "building";
+    buildings["type"] = "fill-extrusion";
+    buildings["minzoom"] = 15;
+    m_map->addLayer(buildings);
+    m_map->setFilter("buildingsLayer", QVariantList({"==", "extrude", "true"}));
+
+    QVariantList fillExtrusionHight = {
+      "interpolate",
+      QVariantList{"linear"},
+      QVariantList{"zoom"},
+      15, 0,
+      15.05, QVariantList{"get", "height"}
+    };
+
+    QVariantList fillExtrusionBase = {
+      "interpolate",
+      QVariantList{"linear"},
+      QVariantList{"zoom"},
+      15, 0,
+      15.05, QVariantList{"get", "min_height"}
+    };
+
+    QVariantList fillExtrusionOpacity = {
+      "interpolate", 
+      QVariantList{"linear"},
+      QVariantList{"zoom"},
+      15, 0,
+      15.5, .6,
+      17, .6,
+      20, 0
+    };
+
+    m_map->setPaintProperty("buildingsLayer", "fill-extrusion-color", QColor("grey"));
+    m_map->setPaintProperty("buildingsLayer", "fill-extrusion-opacity", fillExtrusionOpacity);
+    m_map->setPaintProperty("buildingsLayer", "fill-extrusion-height", fillExtrusionHight);
+    m_map->setPaintProperty("buildingsLayer", "fill-extrusion-base", fillExtrusionBase);
+    m_map->setLayoutProperty("buildingsLayer", "visibility", "visible");
+  }
   if (!m_map->layerExists("navLayer")) {
     qDebug() << "Initializing navLayer";
     QVariantMap nav;
@@ -156,6 +200,16 @@ void MapWindow::updateState(const UIState &s) {
       last_position = QMapbox::Coordinate(locationd_pos.getValue()[0], locationd_pos.getValue()[1]);
       last_bearing = RAD2DEG(locationd_orientation.getValue()[2]);
       velocity_filter.update(locationd_velocity.getValue()[0]);
+      if (loaded_once && (sm.rcv_frame("uiPlan") != model_rcv_frame)) {
+          m = sm["uiPlan"].getUiPlan().getPosition(); // XYZTData in device frame
+          auto model_path = model_to_collection(locationd_location.getCalibratedOrientationECEF(), locationd_location.getPositionECEF(), m);
+          QMapbox::Feature model_path_feature(QMapbox::Feature::LineStringType, model_path, {}, {});
+          QVariantMap modelV2Path;
+          modelV2Path["type"] =  "geojson";
+          modelV2Path["data"] = QVariant::fromValue<QMapbox::Feature>(model_path_feature);
+          m_map->updateSource("modelPathSource", modelV2Path);
+          model_rcv_frame = sm.rcv_frame("uiPlan");
+       }
     }
   }
 
