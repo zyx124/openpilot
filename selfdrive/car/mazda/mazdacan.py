@@ -1,7 +1,6 @@
 import copy
 
 from selfdrive.car.mazda.values import GEN1, GEN2, Buttons
-from common.params import Params
 
 
 def create_steering_control(packer, car_fingerprint, frame, apply_steer, lkas):
@@ -164,15 +163,13 @@ def create_button_cmd(packer, car_fingerprint, counter, button):
 
     return packer.make_can_msg("CRZ_BTNS", 0, values)
   
-def create_acc_cmd(self, packer, CS, CC, hold, resume):
+def create_acc_cmd(self, packer, values, accel, hold, resume):
   if self.CP.carFingerprint in GEN2:
-    values = CS.acc
     msg_name = "ACC"
     bus = 2
 
     if (values["ACC_ENABLED"]):
-      if Params().get_bool("OpenpilotLongitudinalControl") or Params().get_bool("ExperimentalMode"):
-        values["ACCEL_CMD"] = (CC.actuators.accel * 240) + 2000
+      values["ACCEL_CMD"] = accel
       values["HOLD"] = hold
       values["RESUME"] = resume
     else:

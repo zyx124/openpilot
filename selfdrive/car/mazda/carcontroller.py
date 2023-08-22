@@ -3,11 +3,16 @@ from opendbc.can.packer import CANPacker
 from selfdrive.car import apply_driver_steer_torque_limits, apply_ti_steer_torque_limits
 from selfdrive.car.mazda import mazdacan
 from selfdrive.car.mazda.values import CarControllerParams, Buttons, GEN1
-from common.realtime import ControlsTimer as Timer
+from common.realtime import ControlsTimer as Timer, DT_CTRL
+from common.numpy_fast import interp, clip
+from common.filter_simple import FirstOrderFilter
+from common.params import Params
+import math
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 LongCtrlState = car.CarControl.Actuators.LongControlState
-
+MAX_ACCEL_V = [2150, 2300, 2250, 2100]
+MAX_ACCEL_BP = [0.0, 4.0, 10., 20.]
 
 class CarController:
   def __init__(self, dbc_name, CP, VM):
@@ -22,9 +27,13 @@ class CarController:
     self.hold_delay = Timer(1.0) # delay before we start holding as to not hit the brakes too hard
     self.resume_timer = Timer(0.5)
     self.cancel_delay = Timer(0.07) # 70ms delay to try to avoid a race condition with stock system
+    self.acc_filter = FirstOrderFilter(0,.2,DT_CTRL,initialized=False)
+    self.p = Params()
+    
       
   def update(self, CC, CS, now_nanos):
     can_sends = []
+    new_actuators = CC.actuators.copy()
 
     apply_steer = 0
     ti_apply_steer = 0
@@ -78,8 +87,18 @@ class CarController:
       can_sends.append(mazdacan.create_steering_control(self.packer, self.CP.carFingerprint,
                                                       self.frame, apply_steer, CS.cam_lkas))
     else:
+      
       resume = False
       hold = False
+      accel = (CC.actuators.accel *240) + 2000
+      
+      if self.CP.openpilotLongitudinalControl and CS.experimentalMode:
+        self.acc_filter.update_alpha((math.sqrt(math.sqrt(abs(CS.out.vEgo))))/4)
+        accel = self.acc_filter.update(int(clip(accel, 0, interp(CS.out.vEgo, MAX_ACCEL_BP, MAX_ACCEL_V))))
+      else:
+        self.acc_filter.initialized = False
+      new_actuators.accel = accel
+      
       if Timer.interval(2): # send ACC command at 50hz 
         """
         Without this hold/resum logic, the car will only stop momentarily.
@@ -100,12 +119,12 @@ class CarController:
           self.hold_delay.reset() # reset the hold delay
           
         resume = self.resume_timer.active() # stay on for 0.5s to release the brake. This allows the car to move.
-        can_sends.append(mazdacan.create_acc_cmd(self, self.packer, CS, CC, hold, resume))
+        
+        can_sends.append(mazdacan.create_acc_cmd(self, self.packer, CS.acc, accel, hold, resume))
 
       can_sends.append(mazdacan.create_steering_control(self.packer, self.CP.carFingerprint,
                                                       self.frame, apply_steer, CS.cam_lkas))
 
-    new_actuators = CC.actuators.copy()
     new_actuators.steer = apply_steer / self.params.STEER_MAX
     new_actuators.steerOutputCan = apply_steer
 

@@ -1,11 +1,13 @@
 import copy
 
-from cereal import car
+from cereal import car, log
 from common.conversions import Conversions as CV
 from opendbc.can.can_define import CANDefine
 from opendbc.can.parser import CANParser
 from selfdrive.car.interfaces import CarStateBase
 from selfdrive.car.mazda.values import DBC, LKAS_LIMITS, GEN1, GEN2, TI_STATE, CAR, CarControllerParams
+from common.realtime import ControlsTimer
+from common.params import Params
 
 class CarState(CarStateBase):
   def __init__(self, CP):
@@ -20,7 +22,6 @@ class CarState(CarStateBase):
     self.lkas_allowed_speed = False
     self.lkas_disabled = False
     self.cam_lkas = 0
-    self.params = CarControllerParams(CP)
     
     self.ti_ramp_down = False
     self.ti_version = 1
@@ -28,12 +29,16 @@ class CarState(CarStateBase):
     self.ti_violation = 0
     self.ti_error = 0
     self.ti_lkas_allowed = False
+    self.car_params = CarControllerParams(CP)
     self.update = self.update_gen1
     if CP.carFingerprint in GEN1:
       self.update = self.update_gen1
     if CP.carFingerprint in GEN2:
       self.update = self.update_gen2
-
+      self.btn_toggle_timer = ControlsTimer(1.5)
+      self.p = Params()
+      
+      
   def update_gen2(self, cp, cp_cam, cp_body):
     ret = car.CarState.new_message()
     ret.wheelSpeeds = self.get_wheel_speeds(
@@ -57,7 +62,7 @@ class CarState(CarStateBase):
     
     unit_conversion = CV.MPH_TO_MS if cp.vl["SYSTEM_SETTINGS"]["IMPERIAL_UNIT"] else CV.KPH_TO_MS
     
-    ret.steeringPressed = abs(ret.steeringTorque) > self.params.STEER_DRIVER_ALLOWANCE
+    ret.steeringPressed = abs(ret.steeringTorque) > self.car_params.STEER_DRIVER_ALLOWANCE
     ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(can_gear, None))
     ret.gasPressed = ret.gas > 0
     ret.seatbeltUnlatched = False # Cruise will not engage if seatbelt is unlatched (handled by car)
@@ -76,6 +81,19 @@ class CarState(CarStateBase):
     self.cp = cp
     self.cp_cam = cp_cam
     self.acc = copy.copy(cp.vl["ACC"])
+    
+    if not cp.vl["CRZ_BTNS"]["RES"]:
+      self.btn_toggle_timer.reset()
+    if not self.btn_toggle_timer.active():
+      if self.btn_toggle_timer.once_after_reset():
+        self.p.put_bool("ExperimentalMode", not self.p.get_bool("ExperimentalMode"))
+    dist = cp.vl["CRUZE_STAE"]["DIST_SP"]
+    if dist == 4:
+      self.p.put("LongitudinalPersonality", log.longitudinalPersonality.aggressive)
+    elif (dist == 3) or (dist == 2):
+      self.p.put("LongitudinalPersonality", log.longitudinalPersonality.standard)
+    else:
+      self.p.put("LongitudinalPersonality", log.longitudinalPersonality.relaxed)
     
     return ret
     # end GEN2
