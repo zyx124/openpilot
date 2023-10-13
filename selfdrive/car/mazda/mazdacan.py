@@ -1,6 +1,5 @@
 from openpilot.selfdrive.car.mazda.values import GEN1, GEN2, Buttons
 from common.params import Params
-import copy
 
 def create_steering_control(packer, car_fingerprint, frame, apply_steer, lkas):
 
