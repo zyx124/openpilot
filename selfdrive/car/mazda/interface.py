@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 from cereal import car
 from openpilot.common.conversions import Conversions as CV
-from openpilot.selfdrive.car.mazda.values import CAR, LKAS_LIMITS
+from openpilot.selfdrive.car.mazda.values import CAR, LKAS_LIMITS, GEN1, GEN2
 from openpilot.selfdrive.car import get_safety_config
 from openpilot.selfdrive.car.interfaces import CarInterfaceBase
+from selfdrive.global_ti import TI
 
 ButtonType = car.CarState.ButtonEvent.Type
 EventName = car.CarEvent.EventName
@@ -13,12 +14,28 @@ class CarInterface(CarInterfaceBase):
   @staticmethod
   def _get_params(ret, candidate, fingerprint, car_fw, experimental_long, docs):
     ret.carName = "mazda"
-    ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda)]
+
+    if candidate in GEN1:
+      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda)]
+      ret.steerActuatorDelay = 0.1
+      
+    if candidate in GEN2:
+      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda2019)]
+      ret.openpilotLongitudinalControl = True
+      ret.stopAccel = -.5
+      ret.vEgoStarting = .2
+      ret.longitudinalTuning.kpBP = [0., 5., 35.]
+      ret.longitudinalTuning.kpV = [0.0, 0.0, 0.0]
+      ret.longitudinalTuning.kiBP = [0., 35.]
+      ret.longitudinalTuning.kiV = [0.1, 0.1]
+      ret.startingState = True
+      ret.steerActuatorDelay = 0.3
+      
     ret.radarUnavailable = True
 
     ret.dashcamOnly = candidate not in (CAR.CX5_2022, CAR.CX9_2021)
 
-    ret.steerActuatorDelay = 0.1
+    
     ret.steerLimitTimer = 0.8
     ret.tireStiffnessFactor = 0.70   # not optimized yet
 
@@ -40,6 +57,21 @@ class CarInterface(CarInterfaceBase):
       ret.mass = 3443 * CV.LB_TO_KG
       ret.wheelbase = 2.83
       ret.steerRatio = 15.5
+    elif candidate in CAR.MAZDA3_2019:
+      ret.mass = 3000 * CV.LB_TO_KG
+      ret.wheelbase = 2.725
+      ret.steerRatio = 17.0
+      ret.lateralTuning.torque.latAngleFactor = .14
+    elif candidate in (CAR.CX_30, CAR.CX_50):
+      ret.mass = 3375 * CV.LB_TO_KG
+      ret.wheelbase = 2.7
+      ret.steerRatio = 15.5
+      ret.lateralTuning.torque.latAngleFactor = .14
+    elif candidate in (CAR.CX_60, CAR.CX_80, CAR.CX_70, CAR.CX_90):
+      ret.mass = 4217 * CV.LB_TO_KG
+      ret.wheelbase = 3.1
+      ret.steerRatio = 17.6
+      ret.lateralTuning.torque.latAngleFactor = .14
 
     if candidate not in (CAR.CX5_2022, ):
       ret.minSteerSpeed = LKAS_LIMITS.DISABLE_SPEED * CV.KPH_TO_MS
@@ -50,15 +82,24 @@ class CarInterface(CarInterfaceBase):
 
   # returns a car.CarState
   def _update(self, c):
-    ret = self.CS.update(self.cp, self.cp_cam)
+    if self.CP.carFingerprint in GEN1:
+      if self.CP.enableTorqueInterceptor and not TI.enabled:
+        TI.enabled = True
+        self.cp_body = self.CS.get_body_can_parser(self.CP)
+        self.can_parsers = [self.cp, self.cp_cam, self.cp_adas, self.cp_body, self.cp_loopback]
+
+    ret = self.CS.update(self.cp, self.cp_cam, self.cp_body)
 
     # events
     events = self.create_common_events(ret)
+    if self.CP.carFingerprint in GEN1:
+      if self.CS.lkas_disabled:
+        events.add(EventName.lkasDisabled)
+      elif self.CS.low_speed_alert:
+        events.add(EventName.belowSteerSpeed)
 
-    if self.CS.lkas_disabled:
-      events.add(EventName.lkasDisabled)
-    elif self.CS.low_speed_alert:
-      events.add(EventName.belowSteerSpeed)
+      if not self.CS.acc_active_last and not self.CS.ti_lkas_allowed:
+        events.add(EventName.steerTempUnavailable)
 
     ret.events = events.to_msg()
 
