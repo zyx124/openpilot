@@ -72,6 +72,30 @@ def create_steering_control(packer, car_fingerprint, frame, apply_steer, lkas):
 
   return packer.make_can_msg(sig_name, bus, values)
 
+def create_ti_steering_control(packer, car_fingerprint, frame, apply_steer):
+
+  key = 3294744160
+  chksum = apply_steer
+
+  if car_fingerprint in GEN1:
+    values = {
+        "LKAS_REQUEST"     : apply_steer,
+        "CHKSUM"           : chksum,
+        "KEY"              : key
+     }
+  # TODO
+  # 1. Add new CAR values for MDARS Mazdas so that we can change the rate of the message. This will take some work.
+  # 2. Listen for reply's on both CAN buses if not MDARS version of
+  # Mazda (2021+ or m3 2019+) and warn the user if there is a bad connection
+  # but do not cause disengagment
+
+  # Write to both buses for *future* redundancy, but we only check bus 1 for a response in carstate and safey_mazda.h for now.
+  # if (frame % 2 == 0):
+  #  commands.append(packer.make_can_msg("CAM_LKAS2", 0, values))
+
+  return packer.make_can_msg("CAM_LKAS2", 1, values)
+
+
 
 def create_alert_command(packer, cam_msg: dict, ldw: bool, steer_required: bool):
   values = {s: cam_msg[s] for s in [

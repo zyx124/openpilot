@@ -33,7 +33,11 @@ class CarInterface(CarInterfaceBase):
       
     ret.radarUnavailable = True
 
-    ret.dashcamOnly = candidate not in (CAR.CX5_2022, CAR.CX9_2021)
+    ret.dashcamOnly = False # candidate not in (CAR.CX5_2022, CAR.CX9_2021)
+
+    #ret.enableTorqueInterceptor = 0x24A in fingerprint[0]
+    #if ret.enableTorqueInterceptor:
+    #  print("Receiving torque interceptor signal.")
 
     
     ret.steerLimitTimer = 0.8
@@ -100,6 +104,9 @@ class CarInterface(CarInterfaceBase):
 
       if not self.CS.acc_active_last and not self.CS.ti_lkas_allowed:
         events.add(EventName.steerTempUnavailable)
+
+    if not self.CS.acc_active_last and not self.CS.ti_lkas_allowed:
+      events.add(EventName.steerTempUnavailable)
 
     ret.events = events.to_msg()
 

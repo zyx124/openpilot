@@ -106,9 +106,23 @@ class CarState(CarStateBase):
     ret.leftBlinker, ret.rightBlinker = self.update_blinker_from_lamp(40, cp.vl["BLINK_INFO"]["LEFT_BLINK"] == 1,
                                                                       cp.vl["BLINK_INFO"]["RIGHT_BLINK"] == 1)
 
-    ret.steeringAngleDeg = cp.vl["STEER"]["STEER_ANGLE"]
-    ret.steeringTorque = cp.vl["STEER_TORQUE"]["STEER_TORQUE_SENSOR"]
-    ret.steeringPressed = abs(ret.steeringTorque) > LKAS_LIMITS.STEER_THRESHOLD
+    if self.CP.enableTorqueInterceptor:
+      ret.steeringTorque = cp_body.vl["TI_FEEDBACK"]["TI_TORQUE_SENSOR"]
+
+      self.ti_version = cp_body.vl["TI_FEEDBACK"]["VERSION_NUMBER"]
+      self.ti_state = cp_body.vl["TI_FEEDBACK"]["STATE"] # DISCOVER = 0, OFF = 1, DRIVER_OVER = 2, RUN=3
+      self.ti_violation = cp_body.vl["TI_FEEDBACK"]["VIOL"] # 0 = no violation
+      self.ti_error = cp_body.vl["TI_FEEDBACK"]["ERROR"] # 0 = no error
+      if self.ti_version > 1:
+        self.ti_ramp_down = (cp_body.vl["TI_FEEDBACK"]["RAMP_DOWN"] == 1)
+
+      ret.steeringPressed = abs(ret.steeringTorque) > LKAS_LIMITS.TI_STEER_THRESHOLD
+      self.ti_lkas_allowed = not self.ti_ramp_down and self.ti_state == TI_STATE.RUN
+    else:
+      ret.steeringTorque = cp.vl["STEER_TORQUE"]["STEER_TORQUE_SENSOR"]
+      ret.steeringPressed = abs(ret.steeringTorque) > LKAS_LIMITS.STEER_THRESHOLD
+
+    ret.steeringAngleDeg = cp.vl["STEER"]["STEER_ANGLE"]      
 
     ret.steeringTorqueEps = cp.vl["STEER_TORQUE"]["STEER_TORQUE_MOTOR"]
     ret.steeringRateDeg = cp.vl["STEER_RATE"]["STEER_ANGLE_RATE"]
@@ -145,16 +159,11 @@ class CarState(CarStateBase):
     ret.cruiseState.standstill = cp.vl["PEDALS"]["STANDSTILL"] == 1
     ret.cruiseState.speed = cp.vl["CRZ_EVENTS"]["CRZ_SPEED"] * CV.KPH_TO_MS
 
-    if ret.cruiseState.enabled:
-      if not self.lkas_allowed_speed and self.acc_active_last:
-        self.low_speed_alert = True
-      else:
-        self.low_speed_alert = False
-
-    # Check if LKAS is disabled due to lack of driver torque when all other states indicate
-    # it should be enabled (steer lockout). Don't warn until we actually get lkas active
-    # and lose it again, i.e, after initial lkas activation
-    ret.steerFaultTemporary = self.lkas_allowed_speed and lkas_blocked
+    # On if no driver torque the last 5 seconds
+    if self.CP.carFingerprint not in (CAR.CX5_2022, CAR.CX9_2021): 
+      ret.steerFaultTemporary = cp.vl["STEER_RATE"]["HANDS_OFF_5_SECONDS"] == 1
+    else:
+      ret.steerFaultTemporary = False
 
     self.acc_active_last = ret.cruiseState.enabled
 
