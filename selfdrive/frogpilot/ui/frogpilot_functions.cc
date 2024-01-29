@@ -148,6 +148,7 @@ void setDefaultParams() {
     {"StandardJerk", "10"},
     {"StoppingDistance", FrogsGoMoo ? "6" : "0"},
     {"TSS2Tune", "1"},
+    {"EnableTI", "1"},
     {"TurnAggressiveness", FrogsGoMoo ? "150" : "100"},
     {"TurnDesires", "1"},
     {"UnlimitedLength", "1"},

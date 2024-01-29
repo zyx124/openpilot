@@ -28,6 +28,7 @@ private:
 
   std::set<QString> gmKeys;
   std::set<QString> toyotaKeys;
+  std::set<QString> mazdaKeys;
 
   Params params;
   Params paramsMemory{"/dev/shm/params"};

@@ -16,7 +16,7 @@ from panda import ALTERNATIVE_EXPERIENCE
 from openpilot.common.swaglog import cloudlog
 from openpilot.system.version import get_short_branch
 from openpilot.selfdrive.boardd.boardd import can_list_to_can_capnp
-from openpilot.selfdrive.car.car_helpers import get_car, get_startup_event, get_one_can
+from openpilot.selfdrive.car.car_helpers import get_car, get_startup_event, get_one_can, get_ti
 from openpilot.selfdrive.controls.lib.lateral_planner import CAMERA_OFFSET
 from openpilot.selfdrive.controls.lib.drive_helpers import VCruiseHelper, get_lag_adjusted_curvature
 from openpilot.selfdrive.controls.lib.latcontrol import LatControl, MIN_LATERAL_CONTROL_SPEED
@@ -128,6 +128,7 @@ class Controls:
       if self.disengage_on_accelerator:
         self.disengage_on_accelerator = False
         self.params.put_bool("DisengageOnAccelerator", False)
+    self.ti_ready = False
 
     self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.RAISE_LONGITUDINAL_LIMITS_TO_ISO_MAX
 
@@ -363,6 +364,16 @@ class Controls:
 
       if log.PandaState.FaultType.relayMalfunction in pandaState.faults:
         self.events.add(EventName.relayMalfunction)
+
+      if pandaState.torqueInterceptorDetected and not self.ti_ready:
+        self.ti_ready = True
+        self.CP.enableTorqueInterceptor = True
+        #Update CP based on torque_interceptor_ready
+        self.CP = get_ti()
+        # set alternative experiences since get_ti() reset it to default.
+        if not self.disengage_on_accelerator:
+          self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS | ALTERNATIVE_EXPERIENCE.ALWAYS_ON_LATERAL
+          
 
     # Handle HW and system malfunctions
     # Order is very intentional here. Be careful when modifying this.

@@ -53,6 +53,10 @@ def copy_model_variant(params):
     # Copy over the onnx file
     shutil.copy(onnx_path, destination)
 
+    # Reset the calibration
+    params.remove("CalibrationParams")
+    params.remove("LiveTorqueParameters")
+
     # Reboot
     HARDWARE.reboot()
 

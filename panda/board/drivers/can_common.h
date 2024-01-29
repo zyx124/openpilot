@@ -227,6 +227,12 @@ void ignition_can_hook(CANPacket_t *to_push) {
       ignition_can_cnt = 0U;
     }
 
+    // Mazda 2019 exception
+    if ((addr == 0x274) && (len == 8)) {
+      ignition_can = (GET_BYTE(to_push, 5) & 0x4U) != 0U;
+      ignition_can_cnt = 0U;
+    }
+
   } else if (bus == 2) {
     // GM exception, SDGM cars have this message on bus 2
     if ((addr == 0x1F1) && (len == 8)) {
@@ -234,6 +240,8 @@ void ignition_can_hook(CANPacket_t *to_push) {
       ignition_can = (GET_BYTE(to_push, 0) & 0x2U) != 0U;
       ignition_can_cnt = 0U;
     }
+  } else {
+    // do nothing MISRA 
   }
 }
 

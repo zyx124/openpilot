@@ -231,8 +231,6 @@ FrogPilotControlsPanel::FrogPilotControlsPanel(SettingsWindow *parent) : FrogPil
         if (!selection.isEmpty()) {
           int selectedModel = models.indexOf(selection);
           params.putInt("Model", selectedModel);
-          params.remove("CalibrationParams");
-          params.remove("LiveTorqueParameters");
           modelSelectorButton->setValue(selection);
           if (FrogPilotConfirmationDialog::toggle("Reboot required to take effect.", "Reboot Now", this)) {
             Hardware::reboot();

@@ -210,7 +210,8 @@ def cb(sm, item, tid, sz: int, cur: int) -> None:
   # Abort transfer if connection changed to metered after starting upload
   sm.update(0)
   metered = sm['deviceState'].networkMetered
-  if metered and (not item.allow_cellular):
+  upload_allowed = item.allow_cellular or not Params().get_bool("GsmMetered")
+  if metered and (not upload_allowed):
     raise AbortTransferException
 
   cur_upload_items[tid] = replace(item, progress=cur / sz if sz else 1)
@@ -240,7 +241,8 @@ def upload_handler(end_event: threading.Event) -> None:
       sm.update(0)
       metered = sm['deviceState'].networkMetered
       network_type = sm['deviceState'].networkType.raw
-      if metered and (not item.allow_cellular):
+      upload_allowed = item.allow_cellular or not Params().get_bool("GsmMetered")
+      if metered and (not upload_allowed):
         retry_upload(tid, end_event, False)
         continue
 

@@ -187,6 +187,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"Passive", PERSISTENT},
     {"PrimeType", PERSISTENT},
     {"RecordFront", PERSISTENT},
+    {"RecordBack", PERSISTENT},
     {"RecordFrontLock", PERSISTENT},  // for the internal fleet
     {"ReplayControlsState", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
     {"ShouldDoUpdate", CLEAR_ON_MANAGER_START},
@@ -262,6 +263,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"EVTable", PERSISTENT},
     {"Fahrenheit", PERSISTENT},
     {"FireTheBabysitter", PERSISTENT},
+    {"FrogPilotTogglesOpen", CLEAR_ON_MANAGER_START},
     {"FrogPilotTogglesUpdated", PERSISTENT},
     {"FullMap", PERSISTENT},
     {"GasRegenCmd", PERSISTENT},
@@ -367,6 +369,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"VisionTurnControl", PERSISTENT},
     {"WheelIcon", PERSISTENT},
     {"WideCamera", PERSISTENT},
+    {"EnableTI", PERSISTENT},
 };
 
 } // namespace

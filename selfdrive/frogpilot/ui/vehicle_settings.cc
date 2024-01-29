@@ -106,7 +106,9 @@ FrogPilotVehiclesPanel::FrogPilotVehiclesPanel(SettingsWindow *parent) : FrogPil
 
     {"LockDoors", "Lock Doors In Drive", "Automatically lock the doors when in drive and unlock when in park.", ""},
     {"SNGHack", "Stop and Go Hack", "Enable the 'Stop and Go' hack for vehicles without stock stop and go functionality.", ""},
-    {"TSS2Tune", "TSS2 Tune", "Tuning profile based on the tuning profile from DragonPilot for TSS2 vehicles.", ""}
+    {"TSS2Tune", "TSS2 Tune", "Tuning profile based on the tuning profile from DragonPilot for TSS2 vehicles.", ""},
+
+    {"EnableTI", "Enable Torque Interceptor", "Use the TI hardware to steer the wheel", ""},
   };
 
   for (auto &[param, title, desc, icon] : vehicleToggles) {
@@ -123,8 +125,9 @@ FrogPilotVehiclesPanel::FrogPilotVehiclesPanel(SettingsWindow *parent) : FrogPil
 
   gmKeys = {"EVTable", "GasRegenCmd", "LongPitch", "LowerVolt"};
   toyotaKeys = {"LockDoors", "SNGHack", "TSS2Tune"};
+  mazdaKeys = {"EnableTI"};
 
-  std::set<std::string> rebootKeys = {"EVTable", "GasRegenCmd", "LongPitch", "LowerVolt", "TSS2Tune"};
+  std::set<std::string> rebootKeys = {"EVTable", "GasRegenCmd", "LongPitch", "LowerVolt", "TSS2Tune", "EnableTI"};
   for (const std::string &key : rebootKeys) {
     QObject::connect(toggles[key], &ToggleControl::toggleFlipped, [this]() {
       if (FrogPilotConfirmationDialog::toggle("Reboot required to take effect.", "Reboot Now", this)) {
@@ -178,6 +181,8 @@ void FrogPilotVehiclesPanel::setToggles() {
       toggle->setVisible(gmKeys.find(key.c_str()) != gmKeys.end());
     } else if (toyota) {
       toggle->setVisible(toyotaKeys.find(key.c_str()) != toyotaKeys.end());
+    } else if (carMake == "Mazda") {
+      toggle->setVisible(mazdaKeys.find(key.c_str()) != mazdaKeys.end());
     }
   }
 
