@@ -30,11 +30,11 @@ FrogPilotControlsPanel::FrogPilotControlsPanel(SettingsWindow *parent) : FrogPil
     {"NNFF", "NNFF - Neural Network Feedforward", "Use Twilsonco's Neural Network Feedforward for enhanced precision in lateral control.", ""},
     {"SteerRatio", steerRatioStock != 0 ? QString("Steer Ratio (Default: %1)").arg(steerRatioStock, 0, 'f', 2) : "Steer Ratio", "Set a custom steer ratio for your vehicle controls.", ""},
     {"ManualTorqueTune", "Manually Tune Torque Controller", "Use the toggles below to adjust the steering controller", ""},
-    {"LatAccelFactor", latAccelFactorStock != 0 ? QString("Lateral Acceleration Factor (Default: %1)").arg(latAccelFactorStock, 0, 'f', 2) : "Lateral Acceleration", "Adjusts the lateral acceleration factor. Lower is more Aggressive.", ""},
-    {"LatAngleFactor", latAngleFactorStock != 0 ? QString("Lateral Angle Factor").arg(latAngleFactorStock, 0, 'f', 2) : "Lateral Acceleration" , "Adjusts the lateral angle factor. Lower is more Aggressive.\nThis increases the Lateral Acceleration Factor as the steering angle increases.", ""},
-    {"Friction", frictionStock != 0 ? QString("Steering Friction (Default: %1)").arg(frictionStock, 0, 'f', 2) : "Steering Friction", "Adjusts the steering friction compensation.\n The amount of steering command that is needed to overcome steering friction.", ""},
-    {"Delay", delayStock != 0 ? QString("Actuator Delay (Default: %1)").arg(delayStock, 0, 'f', 2) : "Actuator Delay", "Compensation for the lag in the steering.\nA higher value tells openpilot to send steering commands earlier", ""},
-    {"Offset", offsetStock != 0 ? QString("Steering Offset (Default: %1)").arg(offsetStock, 0, 'f', 2) : "Steering Offset", "Some cars require more force to turn one way than the other\ndue to alighnment issues. This compensates for that.", ""},
+    {"LatAccelFactor", QString("Lateral Acceleration Factor (Default: %1)").arg(latAccelFactorStock, 0, 'f', 2), "Adjusts the lateral acceleration factor. Lower is more Aggressive.", ""},
+    {"LatAngleFactor", QString("Lateral Angle Factor").arg(latAngleFactorStock, 0, 'f', 2), "Adjusts the lateral angle factor. Lower is more Aggressive.\nThis increases the Lateral Acceleration Factor as the steering angle increases.", ""},
+    {"Friction", QString("Steering Friction (Default: %1)").arg(frictionStock, 0, 'f', 2), "Adjusts the steering friction compensation.\n The amount of steering command that is needed to overcome steering friction.", ""},
+    {"Delay", QString("Actuator Delay (Default: %1)").arg(delayStock, 0, 'f', 2), "Compensation for the lag in the steering.\nA higher value tells openpilot to send steering commands earlier", ""},
+    {"Offset", QString("Steering Offset (Default: %1)").arg(offsetStock, 0, 'f', 2), "Some cars require more force to turn one way than the other\ndue to alighnment issues. This compensates for that.", ""},
 
     {"LongitudinalTune", "Longitudinal Tuning", "Modify openpilot's acceleration and braking behavior.", "../frogpilot/assets/toggle_icons/icon_longitudinal_tune.png"},
     {"AccelerationProfile", "Acceleration Profile", "Change the acceleration rate to be either sporty or eco-friendly.", ""},
@@ -445,31 +445,20 @@ void FrogPilotControlsPanel::updateCarToggles() {
   steerRatioToggle->setTitle(steerRatioStock != 0 ? QString("Steer Ratio (Default: %1)").arg(steerRatioStock, 0, 'f', 2) : QString("Steer Ratio"));
   steerRatioToggle->updateControl(steerRatioStock * 0.75, steerRatioStock * 1.25, "", 10.0);
   steerRatioToggle->refresh();
-
   FrogPilotParamValueControlFloat *LatAccelFactorToggle = static_cast<FrogPilotParamValueControlFloat*>(toggles["LatAccelFactor"]);
   latAccelFactorStock = params.getFloat("LatAccelFactorStock");
-  //LatAccelFactorToggle->setTitle(steerRatioStock != 0 ? QString("Lat Accel Factor (Default: %1)").arg(latAccelFactorStock, 0, 'f', 2) : QString("Lat Accel Factor"));
-  //LatAccelFactorToggle->updateControl(latAccelFactorStock * 0.5, latAccelFactorStock * 2, "", 10.0, .1);
   LatAccelFactorToggle->refresh();
   FrogPilotParamValueControlFloat *LatAngleFactorToggle = static_cast<FrogPilotParamValueControlFloat*>(toggles["LatAngleFactor"]);
   latAngleFactorStock = params.getFloat("LatAngleFactorStock");
-  //LatAngleFactorToggle->setTitle(latAngleFactorStock != 0 ? QString("Lat Angle Factor (Default: %1)").arg(latAngleFactorStock, 0, 'f', 2) : QString("Lat Angle Factor"));
-  //LatAngleFactorToggle->updateControl(latAngleFactorStock * 0.5, latAngleFactorStock * 2, "", 10.0, .1);
   LatAngleFactorToggle->refresh();
   FrogPilotParamValueControlFloat *FrictionToggle = static_cast<FrogPilotParamValueControlFloat*>(toggles["Friction"]);
   frictionStock = params.getFloat("FrictionStock");
-  //FrictionToggle->setTitle(frictionStock != 0 ? QString("Friction (Default: %1)").arg(frictionStock, 0, 'f', 2) : QString("Steer Friction"));
-  //FrictionToggle->updateControl(frictionStock * 0.5, frictionStock * 2, "", 10.0, .1);
   FrictionToggle->refresh();
   FrogPilotParamValueControlFloat *DelayToggle = static_cast<FrogPilotParamValueControlFloat*>(toggles["Delay"]);
   delayStock = params.getFloat("DelayStock");
-  //DelayToggle->setTitle(delayStock != 0 ? QString("Delay (Default: %1)").arg(delayStock, 0, 'f', 2) : QString("Steer Delay"));
-  //DelayToggle->updateControl(delayStock * 0.5, delayStock * 2, "", 10.0, .1);
   DelayToggle->refresh();
   FrogPilotParamValueControlFloat *OffsetToggle = static_cast<FrogPilotParamValueControlFloat*>(toggles["Offset"]);
   offsetStock = params.getFloat("OffsetStock");
-  //OffsetToggle->setTitle(offsetStock != 0 ? QString("Offset (Default: %1)").arg(offsetStock, 0, 'f', 2) : QString("Steer Offset"));
-  //OffsetToggle->updateControl(offsetStock * 0.5, offsetStock * 2, "", 10.0, .1);
   OffsetToggle->refresh();
 }
 
