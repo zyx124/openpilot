@@ -69,13 +69,13 @@ legend = ["LAT_ACCEL_FACTOR", "MAX_LAT_ACCEL_MEASURED", "FRICTION"]
 "LEXUS GS F 2016" = [2.5, 2.5, 0.08]
 "HYUNDAI STARIA 4TH GEN" = [1.8, 2.0, 0.15]
 
-"MAZDA 3 2019 = [1.45, 3.0, .33]
-"MAZDA CX-30 = [1.45, 3.0, .33]
-"MAZDA CX-50 = [1.45, 3.0, .33]
-"MAZDA CX-60 = [1.45, 3.0, .33]
-"MAZDA CX-70 = [1.45, 3.0, .33]
-"MAZDA CX-80 = [1.45, 3.0, .33]
-"MAZDA CX-90 = [1.45, 3.0, .33]
+"MAZDA 3 2019" = [1.45, 3.0, 0.33]
+"MAZDA CX-30" = [1.45, 3.0, 0.33]
+"MAZDA CX-50" = [1.45, 3.0, 0.33]
+"MAZDA CX-60" = [1.45, 3.0, 0.33]
+"MAZDA CX-70" = [1.45, 3.0, 0.33]
+"MAZDA CX-80" = [1.45, 3.0, 0.33]
+"MAZDA CX-90" = [1.45, 3.0, 0.33]
 
 
 # Dashcam or fallback configured as ideal car
