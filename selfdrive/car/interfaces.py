@@ -231,7 +231,6 @@ class CarInterfaceBase(ABC):
   def get_params(cls, candidate: str, fingerprint: Dict[int, Dict[int, int]], car_fw: List[car.CarParams.CarFw], experimental_long: bool, docs: bool):
     ret = CarInterfaceBase.get_std_params(candidate)
     ret = cls._get_params(ret, candidate, fingerprint, car_fw, experimental_long, docs)
-
     # Enable torque controller for all cars that do not use angle based steering
     if ret.steerControlType != car.CarParams.SteerControlType.angle and Params().get_bool("LateralTune") and Params().get_bool("NNFF"):
       CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
@@ -240,6 +239,8 @@ class CarInterfaceBase(ABC):
       if model is not None:
         Params("/dev/shm/params").put_bool("NNFFModelFuzzyMatch", similarity_score < 0.99)
         Params("/dev/shm/params").put("NNFFModelName", candidate)
+    Params().put_float("DelayStock",ret.steerActuatorDelay)
+    
 
     # Vehicle mass is published curb weight plus assumed payload such as a human driver; notCars have no assumed payload
     if not ret.notCar:
@@ -335,6 +336,11 @@ class CarInterfaceBase(ABC):
     tune.torque.latAccelFactor = params['LAT_ACCEL_FACTOR']
     tune.torque.latAccelOffset = 0.0
     tune.torque.steeringAngleDeadzoneDeg = steering_angle_deadzone_deg
+    p = Params()
+    p.put_float("LatAccelFactorStock", tune.torque.latAccelFactor)
+    p.put_float("LatAngleFactorStock", .14)
+    p.put_float("FrictionStock", tune.torque.friction)
+    p.put_float("OffsetStock", tune.torque.latAccelOffset)
 
   @abstractmethod
   def _update(self, c: car.CarControl) -> car.CarState:

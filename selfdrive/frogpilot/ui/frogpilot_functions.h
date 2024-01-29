@@ -369,9 +369,9 @@ class FrogPilotParamValueControlFloat : public ParamControl {
 public:
   FrogPilotParamValueControlFloat(const QString &param, const QString &title, const QString &desc, const QString &icon,
                     const float &minValue, const float &maxValue, const std::map<int, QString> &valueLabels,
-                    QWidget *parent = nullptr, const bool &loop = true, const QString &label = "", const float &division = 1.0f)
+                    QWidget *parent = nullptr, const bool &loop = true, const QString &label = "", const float &division = 1.0f, const float &step = 1.0f)
     : ParamControl(param, title, desc, icon, parent),
-      minValue(minValue), maxValue(maxValue), valueLabelMappings(valueLabels), loop(loop), labelText(label), division(division) {
+      minValue(minValue), maxValue(maxValue), valueLabelMappings(valueLabels), loop(loop), labelText(label), division(division), step(step) {
         key = param.toStdString();
 
         valueLabel = new QLabel(this);
@@ -384,11 +384,11 @@ public:
         hlayout->addWidget(incrementButton);
 
         connect(decrementButton, &QPushButton::clicked, this, [=]() {
-          updateValue(-1.0f);
+          updateValue(-step);
         });
 
         connect(incrementButton, &QPushButton::clicked, this, [=]() {
-          updateValue(1.0f);
+          updateValue(step);
         });
 
         toggle.hide();
@@ -416,9 +416,9 @@ public:
     QString text;
     auto it = valueLabelMappings.find(value);
     if (division > 0.1f) {
-      text = QString::number(value, 'f', 1);
+      text = QString::number(value, 'f', 2);
     } else {
-      text = it != valueLabelMappings.end() ? it->second : QString::number(value, 'f', 1);
+      text = it != valueLabelMappings.end() ? it->second : QString::number(value, 'f', 2);
     }
     if (!labelText.isEmpty()) {
       text += labelText;
@@ -427,11 +427,12 @@ public:
     valueLabel->setStyleSheet("QLabel { color: #E0E879; }");
   }
 
-  void updateControl(float newMinValue, float newMaxValue, const QString &newLabel, float newDivision = 1.0f) {
+  void updateControl(float newMinValue, float newMaxValue, const QString &newLabel, float newDivision = 1.0f, float newStep = 1.0f) {
     minValue = newMinValue;
     maxValue = newMaxValue;
     labelText = newLabel;
     division = newDivision;
+    step = newStep;
   }
 
   void showEvent(QShowEvent *event) override {
@@ -445,6 +446,7 @@ signals:
 private:
   bool loop;
   float division;
+  float step;
   float maxValue;
   float minValue;
   float value;

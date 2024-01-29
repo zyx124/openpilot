@@ -370,6 +370,19 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"WheelIcon", PERSISTENT},
     {"WideCamera", PERSISTENT},
     {"EnableTI", PERSISTENT},
+
+    // Tuning
+    {"ManualTorqueTune", PERSISTENT},
+    {"LatAccelFactor", PERSISTENT},
+    {"LatAngleFactor", PERSISTENT},
+    {"Friction", PERSISTENT},
+    {"Delay", PERSISTENT},
+    {"Offset", PERSISTENT},
+    {"LatAccelFactorStock", PERSISTENT},
+    {"LatAngleFactorStock", PERSISTENT},
+    {"FrictionStock", PERSISTENT},
+    {"DelayStock", PERSISTENT},
+    {"OffsetStock", PERSISTENT},
 };
 
 } // namespace

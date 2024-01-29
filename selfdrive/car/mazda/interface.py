@@ -7,6 +7,7 @@ from openpilot.selfdrive.car.interfaces import CarInterfaceBase, TorqueFromLater
 from openpilot.selfdrive.controls.lib.drive_helpers import get_friction
 from openpilot.selfdrive.global_ti import TI
 from panda import Panda
+from openpilot.common.params import Params
 ButtonType = car.CarState.ButtonEvent.Type
 EventName = car.CarEvent.EventName
 
@@ -17,7 +18,11 @@ class CarInterface(CarInterfaceBase):
                                            lateral_accel_error: float, lateral_accel_deadzone: float,
                                            steering_angle: float, vego: float, friction_compensation: bool) -> float:
     steering_angle = abs(steering_angle)
-    lat_factor = torque_params.latAccelFactor * ((steering_angle * .14) + 1)
+    if Params().get_bool("ManualTorqueTune"):
+      laf = Params().get_float("LatAngleFactor")
+    else:
+      laf = Params().get_float("LatAngleFactorStock")
+    lat_factor = torque_params.latAccelFactor * ((steering_angle * laf) + 1)
     
     friction = get_friction(lateral_accel_error, lateral_accel_deadzone, FRICTION_THRESHOLD, torque_params, friction_compensation)
     return float(lateral_accel_value / lat_factor) + friction

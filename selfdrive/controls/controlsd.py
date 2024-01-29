@@ -707,6 +707,17 @@ class Controls:
 
       if len(long_plan.speeds):
         actuators.speed = long_plan.speeds[-1]
+        
+      if self.params.get_bool("ManualTorqueTune"):
+        self.CP.steerActuatorDelay = self.params.get_float("Delay")
+        self.LaC.update_live_torque_params(self.params.get_float("LatAccelFactor"),
+                                           self.params.get_float("Offset"),
+                                           self.params.get_float("Friction"))
+      else:
+        self.CP.steerActuatorDelay = self.params.get_float("DelayStock")
+        self.LaC.update_live_torque_params(self.params.get_float("LatAccelFactorStock"),
+                                           self.params.get_float("OffsetStock"),
+                                           self.params.get_float("FrictionStock"))
 
       # Steering PID loop and lateral MPC
       self.desired_curvature, self.desired_curvature_rate = get_lag_adjusted_curvature(self.CP, CS.vEgo,
