@@ -67,8 +67,8 @@ class CarState(CarStateBase):
     ret.steerFaultPermanent = False # TODO locate signal. Car shows light on dash if there is a fault
     ret.steerFaultTemporary = False # TODO locate signal. Car shows light on dash if there is a fault
     ret.cruiseState.speed = cp.vl["CRUZE_STATE"]["CRZ_SPEED"] * unit_conversion
-    ret.cruiseState.enabled = ( (cp.vl["CRUZE_STATE"]["CRZ_ENABLED"] == 1) or (cp.vl["CRUZE_STATE"]["PRE_ENABLE"] == 1) )
-    ret.cruiseState.available = (cp.vl["CRUZE_STATE"]["CRZ_AVAILABLE"] == 1) or ret.cruiseState.enabled # some cars have a different CRZ_AVAILABLE
+    ret.cruiseState.enabled = (cp.vl["CRUZE_STATE"]["CRZ_STATE"] >= 2)
+    ret.cruiseState.available = (cp.vl["CRUZE_STATE"]["CRZ_STATE"] != 0)
     
     speed_kph = cp_cam.vl["SPEED"]["SPEED"] * unit_conversion
     ret.standstill = speed_kph < .1
