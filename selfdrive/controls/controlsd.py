@@ -372,8 +372,10 @@ class Controls:
         self.CP = get_ti()
         # set alternative experiences since get_ti() reset it to default.
         if not self.disengage_on_accelerator:
-          self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS | ALTERNATIVE_EXPERIENCE.ALWAYS_ON_LATERAL
-          
+          self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.DISABLE_DISENGAGE_ON_GAS
+        if self.always_on_lateral:
+          self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.ALWAYS_ON_LATERAL
+        self.CP.alternativeExperience |= ALTERNATIVE_EXPERIENCE.RAISE_LONGITUDINAL_LIMITS_TO_ISO_MAX
 
     # Handle HW and system malfunctions
     # Order is very intentional here. Be careful when modifying this.
