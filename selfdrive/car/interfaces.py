@@ -338,7 +338,6 @@ class CarInterfaceBase(ABC):
     tune.torque.steeringAngleDeadzoneDeg = steering_angle_deadzone_deg
     p = Params()
     p.put_float("LatAccelFactorStock", tune.torque.latAccelFactor)
-    p.put_float("LatAngleFactorStock", .14)
     p.put_float("FrictionStock", tune.torque.friction)
     p.put_float("OffsetStock", tune.torque.latAccelOffset)
 

@@ -8,6 +8,7 @@ from openpilot.selfdrive.controls.lib.drive_helpers import get_friction
 from openpilot.selfdrive.global_ti import TI
 from panda import Panda
 from openpilot.common.params import Params
+
 ButtonType = car.CarState.ButtonEvent.Type
 EventName = car.CarEvent.EventName
 
@@ -36,11 +37,12 @@ class CarInterface(CarInterfaceBase):
   @staticmethod
   def _get_params(ret, candidate, fingerprint, car_fw, experimental_long, docs):
     ret.carName = "mazda"
-
+    p = Params()
     if candidate in GEN1:
       ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.mazda)]
       ret.safetyConfigs[0].safetyParam |= Panda.FLAG_MAZDA_ENABLE_TI
       ret.steerActuatorDelay = 0.1
+      p.put_float("LatAngleFactorStock", .0)
       
     if candidate in GEN2:
       ret.experimentalLongitudinalAvailable = True
@@ -54,6 +56,7 @@ class CarInterface(CarInterfaceBase):
       ret.longitudinalTuning.kiV = [0.1, 0.1]
       ret.startingState = True
       ret.steerActuatorDelay = 0.3
+      p.put_float("LatAngleFactorStock", .14)
       
     ret.radarUnavailable = True
 
