@@ -31,7 +31,7 @@ FrogPilotControlsPanel::FrogPilotControlsPanel(SettingsWindow *parent) : FrogPil
     {"SteerRatio", steerRatioStock != 0 ? QString("Steer Ratio (Default: %1)").arg(steerRatioStock, 0, 'f', 2) : "Steer Ratio", "Set a custom steer ratio for your vehicle controls.", ""},
     {"ManualTorqueTune", "Manually Tune Torque Controller", "Use the toggles below to adjust the steering controller", ""},
     {"LatAccelFactor", QString("Lateral Acceleration Factor (Default: %1)").arg(latAccelFactorStock, 0, 'f', 2), "Adjusts the lateral acceleration factor. Lower is more Aggressive.", ""},
-    {"LatAngleFactor", QString("Lateral Angle Factor").arg(latAngleFactorStock, 0, 'f', 2), "Adjusts the lateral angle factor. Lower is more Aggressive.\nThis increases the Lateral Acceleration Factor as the steering angle increases.", ""},
+    {"LatAngleFactor", QString("Lateral Angle Factor (Default: %1)").arg(latAngleFactorStock, 0, 'f', 2), "Adjusts the lateral angle factor. Lower is more Aggressive.\nThis increases the Lateral Acceleration Factor as the steering angle increases.", ""},
     {"Friction", QString("Steering Friction (Default: %1)").arg(frictionStock, 0, 'f', 2), "Adjusts the steering friction compensation.\n The amount of steering command that is needed to overcome steering friction.", ""},
     {"Delay", QString("Actuator Delay (Default: %1)").arg(delayStock, 0, 'f', 2), "Compensation for the lag in the steering.\nA higher value tells openpilot to send steering commands earlier", ""},
     {"Offset", QString("Steering Offset (Default: %1)").arg(offsetStock, 0, 'f', 2), "Some cars require more force to turn one way than the other\ndue to alighnment issues. This compensates for that.", ""},
