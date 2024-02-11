@@ -94,10 +94,13 @@ class CarController:
               self.resume_timer.reset() # reset the resume timer so its active
             else: # otherwise we're holding
               hold = self.hold_timer.active() # hold for 6s. This allows the electric brake to hold the car.
-              
         else: # if we're moving
           self.hold_timer.reset() # reset the hold timer so its active when we stop
           self.hold_delay.reset() # reset the hold delay
+        if CS.out.gasPressed: # CC.cruiseControl.resume or CC.cruiseControl.override should capture this but its not!?
+          self.resume_timer.reset()
+          self.hold_timer.reset()
+          self.hold_delay.reset()
           
         resume = self.resume_timer.active() # stay on for 0.5s to release the brake. This allows the car to move.
         can_sends.append(mazdacan.create_acc_cmd(self, self.packer, CS, CC, hold, resume))
