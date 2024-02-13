@@ -56,7 +56,7 @@ class CarState(CarStateBase):
     ret.gas = cp_cam.vl["ENGINE_DATA"]["PEDAL_GAS"]
     
     unit_conversion = CV.MPH_TO_MS if cp.vl["SYSTEM_SETTINGS"]["IMPERIAL_UNIT"] else CV.KPH_TO_MS
-    
+
     ret.steeringPressed = abs(ret.steeringTorque) > self.params.STEER_DRIVER_ALLOWANCE
     ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(can_gear, None))
     ret.gasPressed = ret.gas > 0
@@ -66,13 +66,13 @@ class CarState(CarStateBase):
     ret.brake = .1
     ret.steerFaultPermanent = False # TODO locate signal. Car shows light on dash if there is a fault
     ret.steerFaultTemporary = False # TODO locate signal. Car shows light on dash if there is a fault
+
+    ret.standstill = cp_cam.vl["SPEED"]["SPEED"] * unit_conversion == 0.0
     ret.cruiseState.speed = cp.vl["CRUZE_STATE"]["CRZ_SPEED"] * unit_conversion
     ret.cruiseState.enabled = (cp.vl["CRUZE_STATE"]["CRZ_STATE"] >= 2)
     ret.cruiseState.available = (cp.vl["CRUZE_STATE"]["CRZ_STATE"] != 0)
-    
-    speed_kph = cp_cam.vl["SPEED"]["SPEED"] * unit_conversion
-    ret.standstill = speed_kph < .1
-    ret.cruiseState.standstill = False
+    ret.cruiseState.standstill = ret.standstill
+
     self.cp = cp
     self.cp_cam = cp_cam
     self.acc = copy.copy(cp.vl["ACC"])

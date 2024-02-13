@@ -19,7 +19,7 @@ class CarController:
     self.frame = 0
     self.params = CarControllerParams(CP)
     self.hold_timer = Timer(6.0)
-    self.hold_delay = Timer(1.0) # delay before we start holding as to not hit the brakes too hard
+    self.hold_delay = Timer(0.5) # delay before we start holding as to not hit the brakes too hard
     self.resume_timer = Timer(0.5)
     self.cancel_delay = Timer(0.07) # 70ms delay to try to avoid a race condition with stock system
       
@@ -90,17 +90,13 @@ class CarController:
         """
         if CS.out.standstill: # if we're stopped
           if not self.hold_delay.active(): # and we have been stopped for more than hold_delay duration. This prevents a hard brake if we aren't fully stopped.
-            if (CC.cruiseControl.resume or CC.cruiseControl.override or (CC.actuators.longControlState == LongCtrlState.starting)): # and we want to resume
+            if (CC.cruiseControl.resume or CC.cruiseControl.override or CS.out.gasPressed or(CC.actuators.longControlState == LongCtrlState.starting)): # and we want to resume
               self.resume_timer.reset() # reset the resume timer so its active
             else: # otherwise we're holding
               hold = self.hold_timer.active() # hold for 6s. This allows the electric brake to hold the car.
         else: # if we're moving
           self.hold_timer.reset() # reset the hold timer so its active when we stop
           self.hold_delay.reset() # reset the hold delay
-        if CS.out.gasPressed: # CC.cruiseControl.resume or CC.cruiseControl.override should capture this but its not!?
-          self.resume_timer.reset()
-          self.hold_timer.reset()
-          self.hold_delay.reset()
           
         resume = self.resume_timer.active() # stay on for 0.5s to release the brake. This allows the car to move.
         can_sends.append(mazdacan.create_acc_cmd(self, self.packer, CS, CC, hold, resume))
