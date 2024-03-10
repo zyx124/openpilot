@@ -274,6 +274,7 @@ def get_car(logcan, sendcan, experimental_long_allowed, num_pandas=1):
   CP.fuzzyFingerprint = not exact_match
   
   TI.saved_CarInterface = CarInterface
+  TI.saved_candidate = candidate
 
   return CarInterface(CP, CarController, CarState), CP
 
